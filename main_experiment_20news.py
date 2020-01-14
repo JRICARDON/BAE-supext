@@ -71,8 +71,8 @@ p_t,r_t = evaluate_hashing(list_dataset_labels, encoder_Tvae,X_total_input,X_tes
 p_b,r_b = evaluate_hashing(list_dataset_labels, encoder_Bvae,X_total_input,X_test_input,labels_total,labels_test,traditional=False,tipo="topK")
 
 file = open("Results_Top_K_20news.csv","w")
-file.write("20news, VDSH, %d, %f, %f"%(k_topk,p_t,r_t))
-file.write("20news, BAE, %d, %f, %f"%(k_topk,p_b,r_b))
+file.write("20news, VDSH, %d, %f, %f\n"%(k_topk,p_t,r_t))
+file.write("20news, BAE, %d, %f, %f\n"%(k_topk,p_b,r_b))
 file.close()
 
 print("DONE ...")
@@ -109,8 +109,8 @@ for ball_r in ball_radius:
 	test_similares_train =  get_similar(test_hash_t,total_hash_t,tipo='ball',ball=ball_r)
 	p_t,r_t  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
 	
-	file2.write("20news, VDSH, %d, %f, %f"%(ball_r,p_t,r_t))
-	file2.write("20news, BAE, %d, %f, %f"%(ball_r,p_b,r_b))
+	file2.write("20news, VDSH, %d, %f, %f\n"%(ball_r,p_t,r_t))
+	file2.write("20news, BAE, %d, %f, %f\n"%(ball_r,p_b,r_b))
 
 file2.close()
 print("DONE ... ")
