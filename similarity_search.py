@@ -46,6 +46,7 @@ def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_desti
     count_labels = {label:np.sum([label in aux for aux in labels_data]) for label in unique_labels_dataset}
     precision = 0.
     recall =0.
+
     for similars, label in zip(data_similars,labels_data): #source de donde se extrajo info
         if len(similars) == 0: #no encontro similares:
             continue
@@ -56,14 +57,17 @@ def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_desti
             labels_retrieve = labels_destination[similars] 
         
         if type(labels_retrieve[0]) == list: #multiple classes
-            tp = np.sum([len(set(label)& set(aux))>=1 for aux in labels_retrieve]) #al menos 1 clase en comun --quizas variar
-            recall += tp/np.sum([count_labels[aux] for aux in label ]) #cuenta todos los label del dato
+            tp = float(np.sum([len(set(label)& set(aux))>=1 for aux in labels_retrieve])) #al menos 1 clase en comun --quizas variar
+            recall += float(tp)/float(np.sum([count_labels[aux] for aux in label ])) #cuenta todos los label del dato
         else: #only one class
-            tp = np.sum(labels_retrieve == label) #true positive
-            recall += tp/count_labels[label]
-        precision += tp/len(similars)
+            tp = float(np.sum(labels_retrieve == label)) #true positive
+            recall += float(tp)/float(count_labels[label])
+        precision += float(tp)/float(len(similars))
     
-    return precision/len(labels_data), recall/len(labels_data)
+        #print(tp,len(similars),precision)
+        #print(tp,recall)
+
+    return precision/float(len(labels_data)), recall/float(len(labels_data))
 
 def evaluate_hashing(unique_labels_dataset,encoder,train,test,labels_trainn,labels_testt,traditional=True,tipo="topK"):
     """

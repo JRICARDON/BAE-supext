@@ -12,7 +12,9 @@ from text_representation import *
 
 print("\n=====> Loading data ...\n")
 
-texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_snippets()#load_20news()
+texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_20news()#load_snippets()#
+
+print(list_dataset_labels)
 
 from sklearn.model_selection import train_test_split
 labels_t = np.asarray(labels_t)
