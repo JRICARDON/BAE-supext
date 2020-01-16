@@ -80,10 +80,13 @@ Y_total_input = np.concatenate((y_train_input,y_val_input),axis=0)
 labels_total = np.concatenate((labels_train,labels_val),axis=0)
 
 traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=0)
-traditional_vae.fit(X_total_input, X_total, epochs=50, batch_size=batch_size,verbose=0)
+#traditional_vae.fit(X_total_input, X_total, epochs=50, batch_size=batch_size,verbose=1)
 
-binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=0)
+#binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
+#binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=1)
+
+binary_vae,encoder_Bvae,generator_Bvae = binary_VAE2(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
+binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=1)
 
 print("\n=====> Evaluate the Models using KNN Search ... \n")
 
@@ -103,38 +106,38 @@ print("DONE ...")
 
 print("\n=====> Evaluate the Models using Range/Ball Search ... \n")
 
-ball_radius = np.arange(0,10) #ball of radius graphic
+# ball_radius = np.arange(0,10) #ball of radius graphic
 
-binary_p = []
-binary_r = []
-encode_total = encoder_Bvae.predict(X_total_input)
-encode_test = encoder_Bvae.predict(X_test_input)
-probas_total= keras.activations.sigmoid(encode_total).eval(session=K.get_session())
-probas_test= keras.activations.sigmoid(encode_test).eval(session=K.get_session())
-total_hash_b = (probas_total > 0.5)*1
-test_hash_b = (probas_test > 0.5)*1
+# binary_p = []
+# binary_r = []
+# encode_total = encoder_Bvae.predict(X_total_input)
+# encode_test = encoder_Bvae.predict(X_test_input)
+# probas_total= keras.activations.sigmoid(encode_total).eval(session=K.get_session())
+# probas_test= keras.activations.sigmoid(encode_test).eval(session=K.get_session())
+# total_hash_b = (probas_total > 0.5)*1
+# test_hash_b = (probas_test > 0.5)*1
     
-traditional_p = []
-traditional_r = []
-encode_total = encoder_Tvae.predict(X_total_input)
-encode_test = encoder_Tvae.predict(X_test_input)
-median= MedianHashing()
-median.fit(encode_total)
-total_hash_t = median.transform(encode_total)
-test_hash_t = median.transform(encode_test)
+# traditional_p = []
+# traditional_r = []
+# encode_total = encoder_Tvae.predict(X_total_input)
+# encode_test = encoder_Tvae.predict(X_test_input)
+# median= MedianHashing()
+# median.fit(encode_total)
+# total_hash_t = median.transform(encode_total)
+# test_hash_t = median.transform(encode_test)
 
-file2 = open("SUP_Results_BallSearch_%s.csv"%dataset_name,"a")
+# file2 = open("SUP_Results_BallSearch_%s.csv"%dataset_name,"a")
 
-for ball_r in ball_radius:
+# for ball_r in ball_radius:
 
-	test_similares_train =  get_similar(test_hash_b,total_hash_b,tipo='ball',ball=ball_r) 
-	p_b,r_b  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
+# 	test_similares_train =  get_similar(test_hash_b,total_hash_b,tipo='ball',ball=ball_r) 
+# 	p_b,r_b  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
 
-	test_similares_train =  get_similar(test_hash_t,total_hash_t,tipo='ball',ball=ball_r)
-	p_t,r_t  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
+# 	test_similares_train =  get_similar(test_hash_t,total_hash_t,tipo='ball',ball=ball_r)
+# 	p_t,r_t  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
 	
-	file2.write("%s, VDSH, %d, %f, %f\n"%(dataset_name,ball_r,p_t,r_t))
-	file2.write("%s, BAE, %d, %f, %f\n"%(dataset_name,ball_r,p_b,r_b))
+# 	file2.write("%s, VDSH, %d, %f, %f\n"%(dataset_name,ball_r,p_t,r_t))
+# 	file2.write("%s, BAE, %d, %f, %f\n"%(dataset_name,ball_r,p_b,r_b))
 
-file2.close()
-print("DONE ... ")
+# file2.close()
+# print("DONE ... ")
