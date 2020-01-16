@@ -12,8 +12,8 @@ from text_representation import *
 
 print("\n=====> Loading data ...\n")
 
-dataset_name = "20news"
-texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_20news()
+dataset_name = "snippets"
+texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_snippets()#
 
 print(list_dataset_labels)
 

@@ -47,21 +47,43 @@ X_test_input = np.log(X_test+1.0)
 
 print(X_train_input.shape,X_val_input.shape,X_test_input.shape)
 
+print("\n=====> Encoding Labels ...\n")
+
+from keras.utils import to_categorical
+from sklearn import preprocessing
+label_encoder = preprocessing.LabelEncoder()
+label_encoder.fit(list_dataset_labels)
+
+n_classes = len(list_dataset_labels)
+
+y_train = label_encoder.transform(labels_train)
+y_val = label_encoder.transform(labels_val)
+y_test = label_encoder.transform(labels_test)
+
+y_train_input = to_categorical(y_train,num_classes=n_classes)
+y_val_input = to_categorical(y_val,num_classes=n_classes)
+y_test_input = to_categorical(y_test,num_classes=n_classes)
+
+print(y_train_input.shape, y_val_input.shape, y_test_input.shape)
+
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
 
-from models import *
+from supervised_models import *
 
 batch_size = 100
 
 X_total_input = np.concatenate((X_train_input,X_val_input),axis=0)
 X_total = np.concatenate((X_train,X_val),axis=0)
+
+Y_total_input = np.concatenate((y_train_input,y_val_input),axis=0)
+
 labels_total = np.concatenate((labels_train,labels_val),axis=0)
 
 traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=0)
 traditional_vae.fit(X_total_input, X_total, epochs=50, batch_size=batch_size,verbose=0)
 
-binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=2)
-binary_vae.fit(X_total_input, X_total, epochs=50, batch_size=batch_size,verbose=0)
+binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
+binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=0)
 
 print("\n=====> Evaluate the Models using KNN Search ... \n")
 
@@ -72,7 +94,7 @@ k_topk = 100
 p_t,r_t = evaluate_hashing(list_dataset_labels, encoder_Tvae,X_total_input,X_test_input,labels_total,labels_test,traditional=True,tipo="topK")
 p_b,r_b = evaluate_hashing(list_dataset_labels, encoder_Bvae,X_total_input,X_test_input,labels_total,labels_test,traditional=False,tipo="topK")
 
-file = open("Results_Top_K_%s.csv"%dataset_name,"a")
+file = open("SUP_Results_Top_K_%s.csv"%dataset_name,"a")
 file.write("%s, VDSH, %d, %f, %f\n"%(dataset_name,k_topk,p_t,r_t))
 file.write("%s, BAE, %d, %f, %f\n"%(dataset_name,k_topk,p_b,r_b))
 file.close()
@@ -101,7 +123,7 @@ median.fit(encode_total)
 total_hash_t = median.transform(encode_total)
 test_hash_t = median.transform(encode_test)
 
-file2 = open("Results_BallSearch_%s.csv"%dataset_name,"a")
+file2 = open("SUP_Results_BallSearch_%s.csv"%dataset_name,"a")
 
 for ball_r in ball_radius:
 

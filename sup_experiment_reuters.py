@@ -12,8 +12,8 @@ from text_representation import *
 
 print("\n=====> Loading data ...\n")
 
-dataset_name = "20news"
-texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_20news()
+dataset_name = "reuters"
+texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_reuters()
 
 print(list_dataset_labels)
 
@@ -47,21 +47,33 @@ X_test_input = np.log(X_test+1.0)
 
 print(X_train_input.shape,X_val_input.shape,X_test_input.shape)
 
+print("\n=====> ENCODING LABELS  ...\n")
+
+n_classes = len(list_dataset_labels)
+y_train_input = to_categorical(labels_train,num_classes=n_classes)
+y_val_input = to_categorical(labels_val,num_classes=n_classes)
+y_test_input = to_categorical(labels_test,num_classes=n_classes)
+
+print(labels_train_input.shape, labels_val_input.shape, labels_test_input.shape)
+
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
 
-from models import *
+from supervised_models import *
 
 batch_size = 100
 
 X_total_input = np.concatenate((X_train_input,X_val_input),axis=0)
 X_total = np.concatenate((X_train,X_val),axis=0)
+
+Y_total_input = np.concatenate((y_train_input,y_val_input),axis=0)
+
 labels_total = np.concatenate((labels_train,labels_val),axis=0)
 
 traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=0)
 traditional_vae.fit(X_total_input, X_total, epochs=50, batch_size=batch_size,verbose=0)
 
-binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=2)
-binary_vae.fit(X_total_input, X_total, epochs=50, batch_size=batch_size,verbose=0)
+binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
+binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=0)
 
 print("\n=====> Evaluate the Models using KNN Search ... \n")
 
