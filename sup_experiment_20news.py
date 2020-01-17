@@ -82,11 +82,11 @@ labels_total = np.concatenate((labels_train,labels_val),axis=0)
 traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=0)
 traditional_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=1)
 
-#binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-#binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=1)
+binary_vae,encoder_Bvae,generator_Bvae = binary_VAE4(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
+binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=1)
 
-binary_vae,encoder_Bvae,generator_Bvae = binary_VAE3(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=1)
+#binary_vae,encoder_Bvae,generator_Bvae = binary_VAE3(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
+#binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=1)
 
 print("\n=====> Evaluate the Models using KNN Search ... \n")
 
@@ -141,3 +141,5 @@ print("\n=====> Evaluate the Models using Range/Ball Search ... \n")
 
 # file2.close()
 # print("DONE ... ")
+
+
