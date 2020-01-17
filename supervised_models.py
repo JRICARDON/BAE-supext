@@ -44,11 +44,13 @@ def define_pre_generator(Nb,data_dim,layers=2,units=32,dropout=0.0,BN=False,excl
             model.add(BatchNormalization())
     return model
 
-def traditional_VAE(data_dim,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+def traditional_VAE(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
     pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
     print("pre-encoder network:")
     pre_encoder.summary()
-    generator = define_generator(Nb,data_dim,layers=layers_d,units=units,BN=BN)
+    
+    generator = define_pre_generator(Nb,data_dim,layers=layers_d,units=units,BN=BN)
+
     print("generator network:")
     generator.summary()
     
@@ -67,19 +69,25 @@ def traditional_VAE(data_dim,Nb,units,layers_e,layers_d,opt='adam',BN=True):
     
     ## Decoder
     z_sampled = Lambda(sampling, output_shape=(Nb,), name='sampled')([z_mean, z_log_var])
-    output = generator(z_sampled)
+
+    hidden_generator = generator(z_sampled)
+
+    output = Dense(data_dim, activation='softmax')(hidden_generator)
+    
+    supervised_layer = Dense(n_classes, activation='softmax')(hidden_generator)#req n_classes
 
     def vae_loss(x, x_hat):
-        reconstruction_loss = keras.losses.categorical_crossentropy(x, x_hat)*data_dim 
+        reconstruction_loss = keras.losses.categorical_crossentropy(x, x_hat) 
         #reconstruction_loss = keras.losses.binary_crossentropy(x, x_hat)*data_dim 
 
         kl_loss = - 0.5 * K.sum(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis=-1) #con varianza
+        
         return K.mean(reconstruction_loss  + kl_loss)
 
-    traditional_vae = Model(x, output)
-    traditional_vae.compile(optimizer=opt,loss=vae_loss)
+    traditional_vae = Model(inputs=x, outputs=[output,supervised_layer])
+    traditional_vae.compile(optimizer=opt,loss=[vae_loss,'categorical_crossentropy'],loss_weights=[1., 1000.])
+ 
     return traditional_vae,encoder,generator
-
 
 tau = K.variable(0.67, name="temperature") #o tau fijo en 0.67=2/3
 
@@ -197,8 +205,6 @@ def binary_VAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True
 
     hidden = pre_encoder(x)
     logits_b  = Dense(Nb, activation='linear', name='logits-b')(hidden) #log(B_j/1-B_j)
-
-    
 
     #proba = np.exp(logits_b)/(1+np.exp(logits_b)) = sigmoidal(logits_b) <<<<<<<<<< recupera probabilidad
     #dist = Dense(Nb, activation='sigmoid')(hidden) #p(b) #otra forma de modelarlo
