@@ -106,7 +106,7 @@ class My_Callback(keras.callbacks.Callback):
         print(tau_ann.value().eval(session=keras.backend.get_session()))
         return
 
-def binary_VAE(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+def sBAE1(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
     pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
     print("pre-encoder network:")
     pre_encoder.summary()
@@ -136,14 +136,14 @@ def binary_VAE(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True)
 
     def sup_gumbel_loss(x, x_hat):
         reconstruction_loss = keras.losses.categorical_crossentropy(x, x_hat)#*data_dim
-        supervised_loss = keras.losses.categorical_crossentropy(y, supervised_layer)*data_dim#req y
+        supervised_loss = keras.losses.categorical_crossentropy(y, supervised_layer)#req y
 
         dist = keras.activations.sigmoid(logits_b) #B_j = Q(b_j) probability of b_j
         #by formula
         kl_disc_loss = Nb*np.log(2) + K.sum( dist*K.log(dist + K.epsilon()) + (1-dist)* K.log(1-dist + K.epsilon()),axis=1)
         # new.. using logits -- second term cannot be simplified
         #disc_loss = Nb*np.log(2) + K.sum( dist*logits_b + K.log(1-dist + K.epsilon()),axis=1)
-        return K.mean(0.0*reconstruction_loss  + 0.0*kl_disc_loss + supervised_loss)
+        return K.mean(reconstruction_loss  + kl_disc_loss + 1000.0*supervised_loss)
 
     binary_vae = Model(inputs=[x,y], outputs=output)
     binary_vae.compile(optimizer=opt, loss=sup_gumbel_loss)
@@ -151,7 +151,7 @@ def binary_VAE(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True)
     return binary_vae, encoder,generator
 
 
-def binary_VAE2(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+def sBAE2(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
     pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
     print("pre-encoder network:")
     pre_encoder.summary()
@@ -194,7 +194,7 @@ def binary_VAE2(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True
     return binary_vae, encoder,generator
 
 
-def binary_VAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+def sBAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
     pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
     print("pre-encoder network:")
     pre_encoder.summary()
@@ -238,8 +238,7 @@ def binary_VAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True
 
     return binary_vae, encoder,generator
 
-
-def binary_VAE4(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+def sBAE4(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
     pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
     print("pre-encoder network:")
     pre_encoder.summary()
@@ -290,13 +289,70 @@ def binary_VAE4(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True
         kl_disc_loss = Nb*np.log(2) + K.sum( dist*K.log(dist + K.epsilon()) + (1-dist)* K.log(1-dist + K.epsilon()),axis=1)
         # new.. using logits -- second term cannot be simplified
         #disc_loss = Nb*np.log(2) + K.sum( dist*logits_b + K.log(1-dist + K.epsilon()),axis=1)
-        return K.mean(reconstruction_loss  + kl_disc_loss + 10000*loss_siamese)
+        return K.mean(reconstruction_loss + 0.0*kl_disc_loss + 1000*loss_siamese)
 
     binary_vae = Model(inputs=[x,y], outputs=output)
     binary_vae.compile(optimizer=opt, loss=sup_gumbel_loss)
 
     return binary_vae, encoder,generator
 
+def sBAE5(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+    pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
+    print("pre-encoder network:")
+    pre_encoder.summary()
+    generator = define_pre_generator(Nb,data_dim,layers=layers_d,units=units,BN=BN)
+    print("generator network:")
+    generator.summary()
+
+    x = Input(shape=(data_dim,))
+    y = Input(shape=(n_classes,))
+
+    hidden = pre_encoder(x)
+    logits_b  = Dense(Nb, activation='linear', name='logits-b')(hidden) #log(B_j/1-B_j)
+
+    #proba = np.exp(logits_b)/(1+np.exp(logits_b)) = sigmoidal(logits_b) <<<<<<<<<< recupera probabilidad
+    #dist = Dense(Nb, activation='sigmoid')(hidden) #p(b) #otra forma de modelarlo
+    encoder = Model(x, logits_b)
+
+    def sampling(logits_b):
+        #logits_b = K.log(aux/(1-aux) + K.epsilon() )
+        b = logits_b + sample_gumbel(K.shape(logits_b)) # logits + gumbel noise
+        return keras.activations.sigmoid( b/tau )
+
+    b_sampled = Lambda(sampling, output_shape=(Nb,), name='sampled')(logits_b)
+    hidden_generator = generator(b_sampled)
+
+    output = Dense(data_dim, activation='softmax')(hidden_generator)
+    
+    supervised_layer = Dense(n_classes, activation='softmax')(hidden_generator)#req n_classes
+
+    margin = 10
+
+    def sup_gumbel_loss(x, x_hat):
+
+        r = tf.reduce_sum(b_sampled*b_sampled, 1)
+        r = tf.reshape(r, [-1, 1])
+        D = r - 2*tf.matmul(b_sampled, tf.transpose(b_sampled)) + tf.transpose(r)
+     
+        similar_mask = K.dot(y, K.transpose(y))
+
+        loss_siamese = K.mean(similar_mask*D + (1-similar_mask)*K.relu(margin-D))
+
+        # hamm_distances_batch = K.dot(b_sampled, K.transpose(b_sampled))
+        reconstruction_loss = keras.losses.categorical_crossentropy(x, x_hat)#
+        supervised_loss = keras.losses.categorical_crossentropy(y, supervised_layer)#req y
+
+        dist = keras.activations.sigmoid(logits_b) #B_j = Q(b_j) probability of b_j
+        #by formula
+        kl_disc_loss = Nb*np.log(2) + K.sum( dist*K.log(dist + K.epsilon()) + (1-dist)* K.log(1-dist + K.epsilon()),axis=1)
+        # new.. using logits -- second term cannot be simplified
+        #disc_loss = Nb*np.log(2) + K.sum( dist*logits_b + K.log(1-dist + K.epsilon()),axis=1)
+        return K.mean(reconstruction_loss  + 1000*kl_disc_loss + 1000*loss_siamese)
+
+    binary_vae = Model(inputs=[x,y], outputs=output)
+    binary_vae.compile(optimizer=opt, loss=sup_gumbel_loss)
+
+    return binary_vae, encoder,generator
 
     # def loss(y_true, y_pred):
     #     hamm_distances_batch = K.dot(y_pred, K.transpose(y_pred))
