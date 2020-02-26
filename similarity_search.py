@@ -43,7 +43,7 @@ def get_similar(origen,destination,tipo="topK",K=100,ball=2):
 #build similar or compared in labels
 def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_destination=[]):
     #for now compare labels
-    count_labels = {label:np.sum([label in aux for aux in labels_data]) for label in unique_labels_dataset}
+    count_labels = {label:np.sum([label == aux for aux in labels_data]) for label in unique_labels_dataset}
     precision = 0.
     recall =0.
 
@@ -63,7 +63,7 @@ def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_desti
             tp = float(np.sum(labels_retrieve == label)) #true positive
             recall += float(tp)/float(count_labels[label])
         precision += float(tp)/float(len(similars))
-    
+
         #print(tp,len(similars),precision)
         #print(tp,recall)
 

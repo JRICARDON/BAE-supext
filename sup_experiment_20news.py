@@ -1,13 +1,10 @@
 import numpy as np
 import keras,gc,nltk
 import pandas as pd
-nltk.download('reuters')
+
 nltk.download('wordnet')
 
 from load_20news import *
-from load_snippets import *
-from load_reuters import *
-
 from text_representation import *
 
 print("\n=====> Loading data ...\n")
@@ -16,16 +13,17 @@ dataset_name = "20news"
 texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_20news()
 
 unsup_model = 3#choose between 1,2,3,4,5
-### 1: sBAE1: atempts to predict the class label from the representation z learnt by the hidden layer immediately after the encoder's output layer, i.e. the representation learnt by the encoder is used to produce the hash AND to predict the class distribution.
+### 1: sBAE1: attempts to predict the class label from the representation z learnt by the hidden layer immediately after the encoder's output layer, i.e. the representation learnt by the encoder is used to produce the hash AND to predict the class distribution.
 ###    training loss = unsupervised BAE loss + cross_entropy(y,pred_y_from_encoder)
 
 ### 2: sBAE2: identical to sBAE1 but implemented using different tools of the library (keras). 
 ###    training loss = unsupervised BAE loss + cross_entropy(y,pred_y_from_encoder)
 
-### 3: sBAE3: atempts to predict the class label from the representation z' learnt by the hidden layer immediately after the decoder's output layer, i.e., the decoder should be able to reconstruct both the input x and its class y from the binary hash code.
+### 3: sBAE3: attempts to predict the class label from the representation z' learnt by the hidden layer immediately after the decoder's output layer,
+### i.e., the decoder should be able to reconstruct both the input x and its class y from the binary hash code.
 ###    training loss = unsupervised BAE loss + cross_entropy(y,pred_y_from_decoder)
 
-### 4: sBAE4: atempts to predict the class label from the representation z' learnt by the hidden layer immediately after the decoder's output layer, i.e., the decoder should be able to reconstruct both the input x and its class y from the binary hash code.
+### 4: sBAE4: attempts to predict the class label from the representation z' learnt by the hidden layer immediately after the decoder's output layer, i.e., the decoder should be able to reconstruct both the input x and its class y from the binary hash code.
 ###    training loss = unsupervised BAE loss + hamming_loss
 ###    hamming_loss = sum_{similar pairs x,x'} dist(code(x),code(x')) - sum_{dissimilar pairs x,x'} dist(code(x),code(x'))
 
@@ -97,36 +95,36 @@ Y_total_input = np.concatenate((y_train_input,y_val_input),axis=0)
 labels_total = np.concatenate((labels_train,labels_val),axis=0)
 
 traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=0)
-traditional_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=1)
+traditional_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=2)
 
 if unsup_model == 1:#choose between 1,2,3,4,5
 
 	binary_vae,encoder_Bvae,generator_Bvae = sBAE1(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-	binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=1)
+	binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=2)
 	name_model = 'sBAE1'
 
 elif unsup_model == 2:
 
 	binary_vae,encoder_Bvae,generator_Bvae = sBAE2(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-	binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=1)
+	binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=2)
 	name_model = 'sBAE2'
 
 elif unsup_model == 3:
 
 	binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-	binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=1)
+	binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=2)
 	name_model = 'sBAE3'
 
 elif unsup_model == 4:
 
 	binary_vae,encoder_Bvae,generator_Bvae = sBAE4(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-	binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=1)
+	binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=2)
 	name_model = 'sBAE4'
 
 else: #elif unsup_model == 5
 
 	binary_vae,encoder_Bvae,generator_Bvae = sBAE5(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-	binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=1)
+	binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=2)
 	name_model = 'sBAE5'
 
 print("\n=====> Evaluate the Models using KNN Search ... \n")
@@ -138,7 +136,7 @@ k_topk = 100
 p_t,r_t = evaluate_hashing(list_dataset_labels, encoder_Tvae,X_total_input,X_test_input,labels_total,labels_test,traditional=True,tipo="topK")
 p_b,r_b = evaluate_hashing(list_dataset_labels, encoder_Bvae,X_total_input,X_test_input,labels_total,labels_test,traditional=False,tipo="topK")
 
-file = open("SUP_Results_Top_K_%s.csv"%dataset_name,"a")
+file = open("results/SUP_Results_Top_K_%s.csv"%dataset_name,"a")
 file.write("%s, sVDSH, %d, %f, %f\n"%(dataset_name,k_topk,p_t,r_t))
 file.write("%s, %s, %d, %f, %f\n"%(dataset_name,name_model,k_topk,p_b,r_b))
 file.close()
@@ -167,7 +165,7 @@ median.fit(encode_total)
 total_hash_t = median.transform(encode_total)
 test_hash_t = median.transform(encode_test)
 
-file2 = open("SUP_Results_BallSearch_%s.csv"%dataset_name,"a")
+file2 = open("results/SUP_Results_BallSearch_%s.csv"%dataset_name,"a")
 
 for ball_r in ball_radius:
 
