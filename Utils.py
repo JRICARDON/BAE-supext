@@ -44,8 +44,9 @@ def plot_r_sup(data, label, method = 'balls', saving = True):
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'sVDSH'], marker='v', color='salmon', linewidth=2, label = r"$Recall_{VDSH}$")
     plt.title(label)
     plt.legend()
+    plt.xlabel('balls')
     if saving:
-        plt.savefig('results/' + label + '_SUP.png')
+        plt.savefig('results/IMG/' + label + '_SUP.png')
     plt.show()
     plt.close()
 
@@ -92,8 +93,9 @@ def plot_r_semi(data, label, sup_ratio = 0.5, method = 'balls', saving = True):
     plt.plot(x, r_vae, marker='v', color='salmon', linewidth=2, label=r"$Recall_{VDSH}$")
     plt.title(label)
     plt.legend()
+    plt.xlabel('balls')
     if saving:
-        plt.savefig('results/' + label + '_SEMI.png')
+        plt.savefig('results/IMG/' + label + '_SEMI.png')
     plt.show()
     plt.close()
 
@@ -140,8 +142,9 @@ def plot_topk_semi(data, label, sup_ratio=0.5, saving=True):
     plt.plot(x, r_vae, marker='v', color='salmon', linewidth=2, label=r"$Recall_{VDSH}$")
     plt.title(label + ' Top K')
     plt.legend()
+    plt.xlabel('Supervision %')
     if saving:
-        plt.savefig('results/' + label + '_top_K_SEMI.png')
+        plt.savefig('results/IMG/' + label + '_top_K_SEMI.png')
     plt.show()
     plt.close()
 
@@ -184,8 +187,9 @@ def plot_r_unsup(data, label, method='balls', saving=True):
              label=r"$Recall_{VDSH}$")
     plt.title(label)
     plt.legend()
+    plt.xlabel('balls')
     if saving:
-        plt.savefig('results/' + label + '_UNSUP.png')
+        plt.savefig('results/IMG/' + label + '_UNSUP.png')
     plt.show()
     plt.close()
 
