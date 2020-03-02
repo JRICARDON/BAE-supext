@@ -127,8 +127,8 @@ for ball_r in ball_radius:
 	test_similares_train =  get_similar(test_hash_t,total_hash_t,tipo='ball',ball=ball_r)
 	p_t,r_t  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
 	
-	file2.write("%s, VDSH, %d, %f, %f\n"%(dataset_name,ball_r,p_t,r_t))
-	file2.write("%s, BAE, %d, %f, %f\n"%(dataset_name,ball_r,p_b,r_b))
+	file2.write("%s,VDSH, %d, %f, %f\n"%(dataset_name,ball_r,p_t,r_t))
+	file2.write("%s,BAE, %d, %f, %f\n"%(dataset_name,ball_r,p_b,r_b))
 
 file2.close()
 print("DONE ... ")

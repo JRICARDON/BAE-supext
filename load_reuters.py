@@ -1,5 +1,6 @@
 from nltk.corpus import reuters
 
+
 def load_reuters():
 
 	documents_stat = reuters.fileids()

@@ -1,4 +1,3 @@
-
 #### 20 NEWSGROUPS
 from sklearn.datasets import fetch_20newsgroups
 

@@ -2,6 +2,8 @@ import numpy as np
 from keras import backend as K
 import keras
 
+
+
 class MedianHashing(object):
     def __init__(self):
         self.threshold = None

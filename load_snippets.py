@@ -1,4 +1,5 @@
 
+
 def read_file(archivo,symb=' '):
     with open(archivo,'r') as f:
         lineas = f.readlines()

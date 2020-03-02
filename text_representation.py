@@ -2,6 +2,9 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem import WordNetLemmatizer 
 
+
+
+
 #analyzer = TfidfVectorizer(ngram_range=(1, 3)).build_analyzer()
 tokenizer = TfidfVectorizer().build_tokenizer()
 stemmer = SnowballStemmer("english") 

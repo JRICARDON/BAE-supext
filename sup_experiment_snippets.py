@@ -74,23 +74,10 @@ traditional_vae, encoder_Tvae, generator_Tvae = traditional_VAE(X_train.shape[1]
                                                                 layers_e=2, layers_d=0)
 traditional_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size, verbose=2)
 
-# if unsup_model == 1:#choose between 1,2,3,4,5
-#
-# 	binary_vae,encoder_Bvae,generator_Bvae = sBAE1(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-# 	binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=2)
-# 	name_model = 'sBAE1'
-#
-# elif unsup_model == 2:
-#
-# 	binary_vae,encoder_Bvae,generator_Bvae = sBAE2(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-# 	binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size,verbose=2)
-# 	name_model = 'sBAE2'
-#
-# elif unsup_model == 3:
 
 binary_vae, encoder_Bvae, generator_Bvae = sBAE3(X_train.shape[1], n_classes, Nb=32, units=500, layers_e=2, layers_d=2)
 binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size, verbose=2)
-name_model = 'sup_BAE'
+name_model = 'BAE'
 
 from similarity_search import *
 
@@ -102,7 +89,7 @@ p_b, r_b = evaluate_hashing(list_dataset_labels, encoder_Bvae, X_total_input, X_
                             traditional=False, tipo="topK")
 
 file = open("results/SUP_Results_Top_K_%s.csv" % dataset_name, "a")
-file.write("%s,sup_VDSH, %d, %f, %f\n" % (dataset_name, k_topk, p_t, r_t))
+file.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, k_topk, p_t, r_t))
 file.write("%s,%s, %d, %f, %f\n" % (dataset_name, name_model, k_topk, p_b, r_b))
 file.close()
 
@@ -139,7 +126,7 @@ for ball_r in ball_radius:
     test_similares_train = get_similar(test_hash_t, total_hash_t, tipo='ball', ball=ball_r)
     p_t, r_t = measure_metrics(list_dataset_labels, test_similares_train, labels_test, labels_destination=labels_total)
 
-    file2.write("%s,sup_VDSH, %d, %f, %f\n" % (dataset_name, ball_r, p_t, r_t))
+    file2.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, ball_r, p_t, r_t))
     file2.write("%s,%s, %d, %f, %f\n" % (dataset_name, name_model, ball_r, p_b, r_b))
 
 file2.close()

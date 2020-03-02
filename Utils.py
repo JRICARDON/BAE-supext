@@ -1,5 +1,4 @@
-import numpy as np
-import keras,gc,nltk
+import gc,nltk
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from text_representation import *

@@ -5,6 +5,8 @@ from keras.models import Sequential,Model
 from keras import backend as K
 import tensorflow as tf
 
+
+
 def define_pre_encoder(data_dim,layers=2,units=512,dropout=0.0,BN=False): #define pre_encoder network
     model = Sequential(name='pre-encoder')
     model.add(InputLayer(input_shape=(data_dim,)))

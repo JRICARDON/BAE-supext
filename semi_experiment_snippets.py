@@ -10,7 +10,6 @@ multilabel = False
 max_radius = 30
 
 
-nltk.download('reuters')
 nltk.download('wordnet')
 
 from load_20news import *
@@ -103,7 +102,7 @@ labels_total = np.concatenate((labels_train, labels_val), axis=0)
 
 binary_vae, encoder_Bvae, generator_Bvae = sBAE3(X_train.shape[1], n_classes, Nb=32, units=500, layers_e=2, layers_d=2)
 binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size, verbose=2)
-name_model = 'semi_BAE'
+name_model = 'BAE'
 
 
 traditional_vae, encoder_Tvae, generator_Tvae = traditional_VAE(X_train.shape[1], n_classes, Nb=32, units=500,
@@ -124,7 +123,7 @@ p_b, r_b = evaluate_hashing(list_dataset_labels, encoder_Bvae, X_total_input, X_
                             traditional=False, tipo="topK")
 
 file = open("results/SEMI_Results_Top_K_%s.csv" % dataset_name, "a")
-file.write("%s,semi_VDSH, %d, %f, %f, %f\n" % (dataset_name, k_topk, p_t, r_t, test_size))
+file.write("%s,VDSH, %d, %f, %f, %f\n" % (dataset_name, k_topk, p_t, r_t, test_size))
 file.write("%s,%s, %d, %f, %f, %f\n" % (dataset_name, name_model, k_topk, p_b, r_b, test_size))
 file.close()
 
@@ -161,66 +160,10 @@ for ball_r in ball_radius:
     test_similares_train = get_similar(test_hash_t, total_hash_t, tipo='ball', ball=ball_r)
     p_t, r_t = measure_metrics(list_dataset_labels, test_similares_train, labels_test, labels_destination=labels_total)
 
-    file2.write("%s,semi_VDSH, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_t, r_t, test_size))
+    file2.write("%s,VDSH, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_t, r_t, test_size))
     file2.write("%s,%s, %d, %f, %f, %f\n" % (dataset_name, name_model, ball_r, p_b, r_b, test_size))
 
 file2.close()
 print("DONE ... ")
 
 
-
-# # sBAE3(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
-# # BAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
-#
-# data_dim = X_train.shape[1]
-# n_classes = n_classes
-# Nb = 32
-# units = 500
-# layers_e = 2
-# layers_d = 2
-# BN = True
-# opt = 'adam'
-#
-#
-# def my_model(data_dim, n_classes, Nb, units, layers_e, layers_d, opt='adam', BN=True):
-#     pre_encoder = define_pre_encoder(data_dim, layers=layers_e, units=units, BN=BN)
-#     generator = define_pre_generator(Nb, data_dim, layers=layers_d, units=units, BN=BN)
-#     generator.summary()
-#
-#     x = Input(shape=(data_dim,))
-#
-#     hidden = pre_encoder(x)
-#     logits_b = Dense(Nb, activation='linear', name='logits-b')(hidden)  # log(B_j/1-B_j)
-#
-#     def sampling(logits_b):
-#         # logits_b = K.log(aux/(1-aux) + K.epsilon() )
-#         b = logits_b + sample_gumbel(K.shape(logits_b))  # logits + gumbel noise
-#         return keras.activations.sigmoid(b / tau)
-#
-#     b_sampled = Lambda(sampling, output_shape=(Nb,), name='sampled')(logits_b)
-#     hidden_generator = generator(b_sampled)
-#
-#     output = Dense(data_dim, activation='softmax')(hidden_generator)
-#
-#     supervised_layer = Dense(n_classes, activation='softmax')(hidden_generator)  # req n_classes
-#
-#     def sup_gumbel_loss(x, x_hat):
-#         reconstruction_loss = keras.losses.categorical_crossentropy(x, x_hat)  # *data_dim
-#
-#         dist = keras.activations.sigmoid(logits_b)  # B_j = Q(b_j) probability of b_j
-#         # by formula
-#         kl_disc_loss = Nb * np.log(2) + K.sum(
-#             dist * K.log(dist + K.epsilon()) + (1 - dist) * K.log(1 - dist + K.epsilon()),
-#             axis=1)
-#         # new.. using logits -- second term cannot be simplified
-#         # disc_loss = Nb*np.log(2) + K.sum( dist*logits_b + K.log(1-dist + K.epsilon()),axis=1)
-#         return K.mean(reconstruction_loss + kl_disc_loss)
-#
-#     binary_vae = Model(inputs=x, outputs=[output, supervised_layer])
-#     binary_vae.compile(optimizer=opt, loss=[sup_gumbel_loss, 'categorical_crossentropy'], loss_weights=[1., 1000.])
-#
-#     return binary_vae
-#
-#
-# binary_vae = my_model(X_train.shape[1], n_classes, Nb=32, units=500, layers_e=2, layers_d=2)
-# # binary_vae.fit([X_total_input,Y_total_input], X_total, epochs=50, batch_size=batch_size,verbose=2)
