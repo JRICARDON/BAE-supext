@@ -1,30 +1,28 @@
-import numpy as np
-import keras,gc,nltk
-import pandas as pd
-from sklearn.model_selection import train_test_split
-from load_20news import *
-from text_representation import *
+from Utils import *
 from unsupervised_models import *
+from load_20news import *
 
-epochs = 3
+batch_size = 100
+epochs = 50
+multilabel = False
+max_radius = 30
+
+
+### ****************** Load Data ****************** ###
+### *********************************************** ###
 
 print("\n=====> Loading data ...\n")
-
 dataset_name = "20news"
 texts_t, labels_t, texts_test, labels_test, list_dataset_labels = load_20news()
-print(list_dataset_labels)
+
 
 labels_t = np.asarray(labels_t)
 labels_test = np.asarray(labels_test)
 texts_train,texts_val,labels_train,labels_val  = train_test_split(texts_t,labels_t,random_state=20,test_size=0.25)
 
-print("Size Training Set: ",len(texts_train))
-print("Size Validation Set: ",len(texts_val))
-print("Size Test Set: ",len(texts_test))
-
 print("\n=====> Vectorizing Text ...\n")
-
 vectors_train, vectors_val, vectors_test = represent_text(texts_train,texts_val,texts_test,model='TF')
+
 
 print(type(vectors_train))
 X_train = np.asarray(vectors_train.todense())
@@ -35,18 +33,21 @@ del vectors_train,vectors_val,vectors_test
 gc.collect()
 
 print("\n=====> Smoothing TF  ...\n")
-
-## soft TF - much better!
+##soft TF - much better!
 X_train_input = np.log(X_train+1.0) 
 X_val_input = np.log(X_val+1.0) 
 X_test_input = np.log(X_test+1.0) 
 
 print(X_train_input.shape,X_val_input.shape,X_test_input.shape)
 
+
+
+
+### ****************** Training ****************** ###
+### ********************************************** ###
+
+
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
-
-
-batch_size = 100
 
 X_total_input = np.concatenate((X_train_input,X_val_input),axis=0)
 X_total = np.concatenate((X_train,X_val),axis=0)
@@ -58,25 +59,38 @@ traditional_vae.fit(X_total_input, X_total, epochs=epochs, batch_size=batch_size
 binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=2)
 binary_vae.fit(X_total_input, X_total, epochs=epochs, batch_size=batch_size,verbose=2)
 
-print("\n=====> Evaluate the Models using KNN Search ... \n")
 
 from similarity_search import *
 
-k_topk = 100
+
+
+
+### ****************** Top K Methods ******************* ###
+### **************************************************** ###
+
+
+print("\n=====> Evaluate the Models using KNN Search ... \n")
+
+k_topk = 100 #It is the defaul inside the evaluate_hashing function
 
 p_t,r_t = evaluate_hashing(list_dataset_labels, encoder_Tvae,X_total_input,X_test_input,labels_total,labels_test,traditional=True,tipo="topK")
 p_b,r_b = evaluate_hashing(list_dataset_labels, encoder_Bvae,X_total_input,X_test_input,labels_total,labels_test,traditional=False,tipo="topK")
 
 file = open("results/UNSUP_Results_Top_K_%s.csv"%dataset_name,"a")
-file.write("%s, VDSH, %d, %f, %f\n"%(dataset_name,k_topk,p_t,r_t))
-file.write("%s, BAE, %d, %f, %f\n"%(dataset_name,k_topk,p_b,r_b))
+file.write("%s,VDSH, %d, %f, %f\n"%(dataset_name,k_topk,p_t,r_t))
+file.write("%s,BAE, %d, %f, %f\n"%(dataset_name,k_topk,p_b,r_b))
 file.close()
-
 print("DONE ...")
+
+
+
+
+### ****************** Ball Search Methods ****************** ###
+### ********************************************************* ###
 
 print("\n=====> Evaluate the Models using Range/Ball Search ... \n")
 
-ball_radius = np.arange(0,10) #ball of radius graphic
+ball_radius = np.arange(0, max_radius) #ball of radius graphic
 
 binary_p = []
 binary_r = []
@@ -101,13 +115,13 @@ file2 = open("results/UNSUP_Results_BallSearch_%s.csv"%dataset_name,"a")
 for ball_r in ball_radius:
 
 	test_similares_train =  get_similar(test_hash_b,total_hash_b,tipo='ball',ball=ball_r) 
-	p_b,r_b  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
+	p_b,r_b  = measure_metrics(list_dataset_labels,test_similares_train,labels_train,labels_destination=labels_total)
 
 	test_similares_train =  get_similar(test_hash_t,total_hash_t,tipo='ball',ball=ball_r)
-	p_t,r_t  = measure_metrics(list_dataset_labels,test_similares_train,labels_test,labels_destination=labels_total)
+	p_t,r_t  = measure_metrics(list_dataset_labels,test_similares_train,labels_train,labels_destination=labels_total)
 	
-	file2.write("%s, VDSH, %d, %f, %f\n"%(dataset_name,ball_r,p_t,r_t))
-	file2.write("%s, BAE, %d, %f, %f\n"%(dataset_name,ball_r,p_b,r_b))
+	file2.write("%s,VDSH, %d, %f, %f\n"%(dataset_name,ball_r,p_t,r_t))
+	file2.write("%s,BAE, %d, %f, %f\n"%(dataset_name,ball_r,p_b,r_b))
 
 file2.close()
 print("DONE ... ")

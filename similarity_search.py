@@ -40,36 +40,46 @@ def get_similar(origen,destination,tipo="topK",K=100,ball=2):
         origen_similares[-1] = np.setdiff1d(origen_similares[-1] , np.asarray(number))
     return origen_similares
 
-#build similar or compared in labels
-def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_destination=[]):
-    #for now compare labels
-    count_labels = {label:np.sum([label == aux for aux in labels_data]) for label in unique_labels_dataset}
-    precision = 0.
-    recall =0.
+# build similar or compared in labels
+def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_destination=[], multilabel = False):
+    # Counting of the  number of observation in each class in the training set
+    if multilabel:
+        count_labels = {label: np.sum([label in aux for aux in labels_destination]) for label in unique_labels_dataset}
+    else:
+        count_labels = {label: np.sum([label == aux for aux in labels_destination]) for label in unique_labels_dataset}
 
-    for similars, label in zip(data_similars,labels_data): #source de donde se extrajo info
-        if len(similars) == 0: #no encontro similares:
+    precision = 0.
+    recall = 0.
+
+    # Consider the label and the similars of all the observations in the test set
+    for similars, label in zip(data_similars,labels_data):
+        if len(similars) == 0: #There is no similar objects
             continue
             
-        if len(labels_destination) == 0: #extrajo del mismo conjunto
-            labels_retrieve = labels_data[similars] 
-        else:
-            labels_retrieve = labels_destination[similars] 
+        # if len(labels_destination) == 0:
+        #     labels_retrieve = labels_data[similars]
+        # else:
+
+        # Retrieving the labels of the obs. in the training set that are similar to the obs. of the test set
+        labels_retrieve = labels_destination[similars]
         
-        if type(labels_retrieve[0]) == list: #multiple classes
-            tp = float(np.sum([len(set(label)& set(aux))>=1 for aux in labels_retrieve])) #al menos 1 clase en comun --quizas variar
-            recall += float(tp)/float(np.sum([count_labels[aux] for aux in label ])) #cuenta todos los label del dato
+        if multilabel == True: # multiple classes
+            # considering all the train obs. that have at least one label in common with the test obs.
+            tp = np.sum([len(set(label)& set(aux))>=1 for aux in labels_retrieve])
+            # computing the recall by considering all the labels in the training set
+            recall += tp/np.sum([count_labels[aux] for aux in label ])
         else: #only one class
-            tp = float(np.sum(labels_retrieve == label)) #true positive
-            recall += float(tp)/float(count_labels[label])
-        precision += float(tp)/float(len(similars))
+            tp = np.sum(labels_retrieve == label) # true positive
+            recall += tp/count_labels[label]
+        precision += tp/len(similars)
 
-        #print(tp,len(similars),precision)
-        #print(tp,recall)
+        total_precision = precision/len(labels_data)
+        total_recall = recall / len(labels_data)
 
-    return precision/float(len(labels_data)), recall/float(len(labels_data))
+    return total_precision, total_recall
 
-def evaluate_hashing(unique_labels_dataset,encoder,train,test,labels_trainn,labels_testt,traditional=True,tipo="topK"):
+def evaluate_hashing(unique_labels_dataset,encoder,train,test,labels_trainn,
+                     labels_testt,traditional=True,tipo="topK", multilabel = False):
     """
         Evaluate Hashing correclty: Query and retrieve on a different set
     """
@@ -89,6 +99,8 @@ def evaluate_hashing(unique_labels_dataset,encoder,train,test,labels_trainn,labe
         test_hash = (probas_test > 0.5)*1
 
     test_similares_train =  get_similar(test_hash,train_hash,tipo="topK",K=100)
-    return measure_metrics(unique_labels_dataset,test_similares_train,labels_testt,labels_destination=labels_trainn)
+    r, p = measure_metrics(unique_labels_dataset,test_similares_train,labels_testt,
+                           labels_destination=labels_trainn, multilabel = multilabel)
+    return r,p
 
 

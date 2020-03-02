@@ -3,6 +3,11 @@ import numpy as np
 import keras, gc, nltk
 import pandas as pd
 
+batch_size = 100
+epochs = 50
+multilabel = False
+max_radius = 30
+
 nltk.download('reuters')
 nltk.download('wordnet')
 
@@ -24,9 +29,7 @@ from sklearn.model_selection import train_test_split
 labels_t = np.asarray(labels_t)
 labels_test = np.asarray(labels_test)
 
-#test_size = int(sys.argv[1])
-test_size = 50
-print(test_size)
+test_size = int(sys.argv[1])
 test_size = test_size/100
 texts_train, texts_val, labels_train, labels_val = train_test_split(texts_t, labels_t, random_state=20, test_size=test_size)
 
@@ -98,7 +101,7 @@ labels_total = np.concatenate((labels_train, labels_val), axis=0)
 
 binary_vae, encoder_Bvae, generator_Bvae = sBAE3(X_train.shape[1], n_classes, Nb=32, units=500, layers_e=2, layers_d=2)
 binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=50, batch_size=batch_size, verbose=2)
-name_model = 'sBAE3_semi'
+name_model = 'semi_BAE'
 
 
 traditional_vae, encoder_Tvae, generator_Tvae = traditional_VAE(X_train.shape[1], n_classes, Nb=32, units=500,
@@ -120,15 +123,15 @@ p_b, r_b = evaluate_hashing(list_dataset_labels, encoder_Bvae, X_total_input, X_
                             traditional=False, tipo="topK")
 
 file = open("results/SEMI_Results_Top_K_%s.csv" % dataset_name, "a")
-file.write("%s, sVDSH, %d, %f, %f, %f\n" % (dataset_name, k_topk, p_t, r_t, test_size))
-file.write("%s, %s, %d, %f, %f, %f\n" % (dataset_name, name_model, k_topk, p_b, r_b, test_size))
+file.write("%s,semi_VDSH, %d, %f, %f, %f\n" % (dataset_name, k_topk, p_t, r_t, test_size))
+file.write("%s,%s, %d, %f, %f, %f\n" % (dataset_name, name_model, k_topk, p_b, r_b, test_size))
 file.close()
 
 print("DONE ...")
 
 print("\n=====> Evaluate the Models using Range/Ball Search ... \n")
 
-ball_radius = np.arange(0, 10)  # ball of radius graphic
+ball_radius = np.arange(0, max_radius)  # ball of radius graphic
 
 binary_p = []
 binary_r = []
@@ -157,8 +160,8 @@ for ball_r in ball_radius:
     test_similares_train = get_similar(test_hash_t, total_hash_t, tipo='ball', ball=ball_r)
     p_t, r_t = measure_metrics(list_dataset_labels, test_similares_train, labels_test, labels_destination=labels_total)
 
-    file2.write("%s, sVDSH, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_t, r_t, test_size))
-    file2.write("%s, %s, %d, %f, %f, %f\n" % (dataset_name, name_model, ball_r, p_b, r_b, test_size))
+    file2.write("%s,semi_VDSH, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_t, r_t, test_size))
+    file2.write("%s,%s, %d, %f, %f, %f\n" % (dataset_name, name_model, ball_r, p_b, r_b, test_size))
 
 file2.close()
 print("DONE ... ")
