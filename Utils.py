@@ -112,7 +112,7 @@ from similarity_search import *
 
 def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
                  X_total_input, X_test_input, labels_train, labels_total, labels_test,
-                 dataset_name, max_radius, K_topK=100, type='UNSUP', multilabel = False):
+                 dataset_name, max_radius, K_topK=100, type='UNSUP', multilabel = False, ratio_sup = None):
 
     p_t, r_t = evaluate_hashing(list_dataset_labels, encoder_Tvae, X_total_input, X_test_input, labels_total,
                                 labels_test, traditional=True, tipo="topK", multilabel = multilabel)
@@ -120,10 +120,17 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
                                 labels_test, traditional=False, tipo="topK", multilabel = multilabel)
 
     file = open("results/" + type + "_Results_Top_K_%s.csv" % dataset_name, "a")
-    file.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, K_topK, p_t, r_t))
-    file.write("%s,BAE, %d, %f, %f\n" % (dataset_name, K_topK, p_b, r_b))
-    file.close()
-    print("DONE ...")
+
+    if type == 'SEMI':
+        file.write("%s,VDSH, %d, %f, %f, %f\n" % (dataset_name, K_topK, p_t, r_t, ratio_sup))
+        file.write("%s,BAE, %d, %f, %f, %f\n" % (dataset_name, K_topK, p_b, r_b, ratio_sup))
+        file.close()
+        print("DONE ...")
+    else:
+        file.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, K_topK, p_t, r_t))
+        file.write("%s,BAE, %d, %f, %f\n" % (dataset_name, K_topK, p_b, r_b))
+        file.close()
+        print("DONE ...")
 
     ### ****************** Ball Search Methods ****************** ###
 
@@ -145,7 +152,7 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 
     ball_radius = np.arange(0, max_radius)  # ball of radius graphic
 
-    file2 = open("results/UNSUP_Results_BallSearch_%s.csv" % dataset_name, "a")
+    file2 = open("results/" + type + "_Results_BallSearch_%s.csv" % dataset_name, "a")
 
     for ball_r in ball_radius:
         test_similares_train = get_similar(test_hash_b, total_hash_b, tipo='ball', ball=ball_r)
@@ -155,9 +162,12 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
         test_similares_train = get_similar(test_hash_t, total_hash_t, tipo='ball', ball=ball_r)
         p_t, r_t = measure_metrics(list_dataset_labels, test_similares_train, labels_train,
                                    labels_destination=labels_total, multilabel = multilabel)
-
-        file2.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, ball_r, p_t, r_t))
-        file2.write("%s,BAE, %d, %f, %f\n" % (dataset_name, ball_r, p_b, r_b))
+        if type == 'SEMI':
+            file2.write("%s,VDSH, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_t, r_t, ratio_sup))
+            file2.write("%s,BAE, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_b, r_b, ratio_sup))
+        else:
+            file2.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, ball_r, p_t, r_t))
+            file2.write("%s,BAE, %d, %f, %f\n" % (dataset_name, ball_r, p_b, r_b))
 
     file2.close()
     print("DONE ... ")

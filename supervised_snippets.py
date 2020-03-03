@@ -1,25 +1,24 @@
 from Utils import *
 from supervised_models import *
-from load_20news import *
+from load_snippets import *
+#
+# dataset_name = '20news'
+# batch_size = 1000
+# epochs = 20
+# multilabel = False
+# max_radius = 3
+#
+# #['UNSUP','SEMI', 'SUP']
+# type = 'SEMI'
+# ratio_sup = .5
 
-dataset_name = '20news'
-batch_size = 1000
-epochs = 20
+
+dataset_name = 'snippets'
 multilabel = False
-max_radius = 3
-
-#['UNSUP','SEMI', 'SUP']
-type = 'SEMI'
-ratio_sup = .5
-
-
-if type != 'UNSUP':
-	supervision = True
-
 
 ### ****************** Loading and Transforming ****************** ###
 
-X_raw, X, Y, list_dataset_labels = data_in_arrays(load_20news(), ratio_val=ratio_sup)
+X_raw, X, Y, list_dataset_labels = data_in_arrays(load_snippets(), ratio_val=ratio_sup)
 
 X_train_input, X_val_input, X_test_input = X[0], X[1], X[2]
 labels_train, labels_t, labels_val, labels_test = Y[0], Y[1], Y[2], Y[3]
@@ -36,7 +35,7 @@ labels_total = np.concatenate((labels_train, labels_val), axis=0)
 
 Y_total_input, y_test_input = target_in_array(list_dataset_labels, n_classes,
 											  labels_train, labels_val, labels_test,
-											  multilabel = False, semi_supervised = supervision)
+											  multilabel = False, semi_supervised = semi_supervised)
 
 
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
@@ -53,5 +52,5 @@ name_model = 'BAE'
 save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 			 X_total_input, X_test_input, labels_train, labels_total, labels_test,
 			 dataset_name, max_radius,
-			 K_topK = 100, type = type, multilabel = multilabel )
+			 K_topK = 100, type = type, multilabel = multilabel, ratio_sup = ratio_sup)
 

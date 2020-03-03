@@ -3,12 +3,13 @@ from unsupervised_models import *
 from load_snippets import *
 
 dataset_name = 'snippets'
-batch_size = 2000
-epochs = 20
 multilabel = False
-max_radius = 3
-type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
-ratio_sup = .25
+
+# batch_size = 2000
+# epochs = 20
+# max_radius = 3
+# type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
+# ratio_sup = .25
 
 ### ****************** Loading and Transforming ****************** ###
 

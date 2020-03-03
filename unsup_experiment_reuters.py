@@ -3,12 +3,13 @@ from unsupervised_models import *
 from load_reuters import *
 
 dataset_name = 'reuters'
-batch_size = 2000
-epochs = 20
 multilabel = True
-max_radius = 3
-type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
-ratio_sup = .25
+
+# batch_size = 2000
+# epochs = 20
+# max_radius = 3
+# type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
+# ratio_sup = .25
 
 ### ****************** Loading and Transforming ****************** ###
 

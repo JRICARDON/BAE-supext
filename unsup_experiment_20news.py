@@ -2,13 +2,15 @@ from Utils import *
 from unsupervised_models import *
 from load_20news import *
 
+# batch_size = 2000
+# epochs = 20
+# max_radius = 3
+# type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
+# ratio_sup = .25
+
+
 dataset_name = '20news'
-batch_size = 2000
-epochs = 20
 multilabel = False
-max_radius = 3
-type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
-ratio_sup = .25
 
 
 
