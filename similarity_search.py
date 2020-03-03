@@ -4,6 +4,7 @@ import keras
 
 
 
+
 class MedianHashing(object):
     def __init__(self):
         self.threshold = None
@@ -80,8 +81,8 @@ def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_desti
 
     return total_precision, total_recall
 
-def evaluate_hashing(unique_labels_dataset,encoder,train,test,labels_trainn,
-                     labels_testt,traditional=True,tipo="topK", multilabel = False):
+def evaluate_hashing(unique_labels_dataset,encoder,train,test,labels_trainn, labels_testt,
+                     traditional=True,tipo="topK", multilabel = False, topK = 100):
     """
         Evaluate Hashing correclty: Query and retrieve on a different set
     """
@@ -100,9 +101,7 @@ def evaluate_hashing(unique_labels_dataset,encoder,train,test,labels_trainn,
         train_hash = (probas_train > 0.5)*1
         test_hash = (probas_test > 0.5)*1
 
-    test_similares_train =  get_similar(test_hash,train_hash,tipo="topK",K=100)
+    test_similares_train =  get_similar(test_hash,train_hash,tipo="topK",K=topK)
     r, p = measure_metrics(unique_labels_dataset,test_similares_train,labels_testt,
                            labels_destination=labels_trainn, multilabel = multilabel)
     return r,p
-
-

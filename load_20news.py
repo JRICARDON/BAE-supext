@@ -1,4 +1,5 @@
 #### 20 NEWSGROUPS
+#from Utils import *
 from sklearn.datasets import fetch_20newsgroups
 
 def clean_20news(textos):
@@ -46,8 +47,8 @@ def load_20news():
 	y_test = newsgroups_test.target
 	labels_test = [labels[valor] for valor in y_test]
 
-	print("Datos de entrenamiento: ",y_t.shape)
-	print("Datos de prueba: ",y_test.shape)
+	print("Training data: ",y_t.shape)
+	print("Test data: ",y_test.shape)
 
 	texts_t = clean_20news(texts_t)
 	texts_test = clean_20news(texts_test)

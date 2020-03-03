@@ -13,8 +13,8 @@ def load_snippets(root_dir = ''):
 
 	labels_t,texts_t = read_file(root_dir+"Data/data-web-snippets/train.txt")
 	labels_test,texts_test = read_file(root_dir+"Data/data-web-snippets/test.txt")
-	print("Datos de entrenamiento: ",len(texts_t))
-	print("Datos de pruebas: ",len(texts_test))
+	print("Training data: ",len(texts_t))
+	print("Test data: ",len(texts_test))
 
 	labels = list(set(labels_t))
 
