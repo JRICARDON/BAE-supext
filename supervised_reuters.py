@@ -33,7 +33,7 @@ labels_total = np.concatenate((labels_train, labels_val), axis=0)
 Y_total_input, y_test_input = target_in_array(list_dataset_labels, n_classes,
 											  labels_train, labels_val, labels_test,
 											  multilabel = multilabel, semi_supervised = semi_supervised)
-
+n_classes = Y_total_input.shape[1]
 
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
 
