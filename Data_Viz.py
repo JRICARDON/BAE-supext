@@ -20,9 +20,9 @@ plot_results(data = data_reuters, label='Reuters (Supervised)', Nb = nb)
 
 ## Semi-Supervised
 data_20news, data_snippets, data_reuters = load_results(type='SEMI')
-plot_results_semi(data_20news, label = '20news (Semi-Supervised)', type = 'SEMI', Nb = nb)
-plot_results_semi(data = data_snippets, label='Snippets (Semi-Supervised)', Nb = nb)
-plot_results_semi(data = data_reuters, label='Reuters (Semi-Supervised)', Nb = nb)
+plot_results_semi(data_20news, label = '20news (Semi-Supervised)', type = 'SEMI', Nb = nb, threshold = .3)
+plot_results_semi(data = data_snippets, label='Snippets (Semi-Supervised)', Nb = nb, threshold=.3)
+plot_results_semi(data = data_reuters, label='Reuters (Semi-Supervised)', Nb = nb, threshold=.3)
 
 
 ## --> Top K

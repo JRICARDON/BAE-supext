@@ -230,7 +230,7 @@ def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32):
     plt.plot(data.balls.unique(), data.Precision[data.Algorithm == 'VDSH'], marker='o', color='lightblue', linewidth=2, label=r"$Prec_{VDSH}$")
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'BAE'], marker='v', color='red', linewidth=2, label = r"$Recall_{BAE}$")
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'VDSH'], marker='v', color='salmon', linewidth=2, label = r"$Recall_{VDSH}$")
-    plt.title(label+ 'Nb=' + str(Nb))
+    plt.title(label+ ' Nb=' + str(Nb))
     plt.legend()
     plt.xlabel('balls')
     if saving:
@@ -241,7 +241,7 @@ def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32):
 ######################################################################
 
 
-def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True):
+def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True, Nb = 32):
 
     import matplotlib.pyplot as plt
 
@@ -251,7 +251,7 @@ def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True)
     plt.plot(data.balls.unique(), data.Precision[data.Algorithm == 'VDSH'], marker='o', color='lightblue', linewidth=2, label=r"$Prec_{VDSH}$")
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'BAE'], marker='v', color='red', linewidth=2, label = r"$Recall_{BAE}$")
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'VDSH'], marker='v', color='salmon', linewidth=2, label = r"$Recall_{VDSH}$")
-    plt.title(label + ' - sup = ' + str(threshold))
+    plt.title(label + ' - sup = ' + str(threshold) + ' Nb=' + str(Nb))
     plt.legend()
     plt.xlabel('balls')
     if saving:
@@ -288,7 +288,6 @@ def plot_results_topk(data, label, saving=True, Nb = 32):
     import matplotlib.pyplot as plt
 
     data = data[data.Nb == Nb]
-
     x = data.sup_ratio.unique()
     p_vae = data.Precision[(data.Algorithm == 'VDSH')]
     p_bae = data.Precision[(data['Algorithm'] == 'BAE')]
@@ -299,7 +298,7 @@ def plot_results_topk(data, label, saving=True, Nb = 32):
     plt.plot(x, p_vae, marker='o', color='lightblue', linewidth=2, label=r"$Prec_{VDSH}$")
     plt.plot(x, r_bae, marker='v', color='red', linewidth=2, label=r"$Recall_{BAE}$")
     plt.plot(x, r_vae, marker='v', color='salmon', linewidth=2, label=r"$Recall_{VDSH}$")
-    plt.title(label + ' (Top K)')
+    plt.title(label + ' (Top K)' + ' Nb=' + str(Nb))
     plt.legend()
     plt.xlabel('Supervision %')
     if saving:
@@ -308,7 +307,6 @@ def plot_results_topk(data, label, saving=True, Nb = 32):
     plt.close()
 
 ######################################################################
-
 
 
 
