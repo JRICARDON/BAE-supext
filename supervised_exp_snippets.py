@@ -40,10 +40,10 @@ Y_total_input, y_test_input = target_in_array(list_dataset_labels, n_classes,
 
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
 
-traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=0)
+traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=0)
 traditional_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size,verbose=2)
 
-binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=32,units=500,layers_e=2,layers_d=2)
+binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=2)
 binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size,verbose=2)
 name_model = 'BAE'
 
@@ -52,5 +52,5 @@ name_model = 'BAE'
 save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 			 X_total_input, X_test_input, labels_train, labels_total, labels_test,
 			 dataset_name, max_radius,
-			 K_topK = 100, type = type, multilabel = multilabel, ratio_sup = ratio_sup)
+			 K_topK = 100, type = type, multilabel = multilabel, ratio_sup = ratio_sup, Nb=nb)
 

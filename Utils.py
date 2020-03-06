@@ -2,7 +2,6 @@ import gc,nltk
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from text_representation import *
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 # nltk.download('reuters')
@@ -120,7 +119,7 @@ from similarity_search import *
 
 def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
                  X_total_input, X_test_input, labels_train, labels_total, labels_test,
-                 dataset_name, max_radius, K_topK=100, type='UNSUP', multilabel = False, ratio_sup = None):
+                 dataset_name, max_radius, K_topK=100, type='UNSUP', multilabel = False, ratio_sup = None, Nb = 32):
 
     p_t, r_t = evaluate_hashing(list_dataset_labels, encoder_Tvae, X_total_input, X_test_input, labels_total,
                                 labels_test, traditional=True, tipo="topK", multilabel = multilabel)
@@ -130,13 +129,13 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
     file = open("results/" + type + "_Results_Top_K_%s.csv" % dataset_name, "a")
 
     if type == 'SEMI':
-        file.write("%s,VDSH, %d, %f, %f, %f\n" % (dataset_name, K_topK, p_t, r_t, ratio_sup))
-        file.write("%s,BAE, %d, %f, %f, %f\n" % (dataset_name, K_topK, p_b, r_b, ratio_sup))
+        file.write("%s,VDSH, %d, %f, %f, %f, %d\n" % (dataset_name, K_topK, p_t, r_t, ratio_sup, Nb))
+        file.write("%s,BAE, %d, %f, %f, %f, %d\n" % (dataset_name, K_topK, p_b, r_b, ratio_sup, Nb))
         file.close()
         print("DONE ...")
     else:
-        file.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, K_topK, p_t, r_t))
-        file.write("%s,BAE, %d, %f, %f\n" % (dataset_name, K_topK, p_b, r_b))
+        file.write("%s,VDSH, %d, %f, %f, %d\n" % (dataset_name, K_topK, p_t, r_t, Nb))
+        file.write("%s,BAE, %d, %f, %f, %d\n" % (dataset_name, K_topK, p_b, r_b, Nb))
         file.close()
         print("DONE ...")
 
@@ -171,11 +170,11 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
         p_t, r_t = measure_metrics(list_dataset_labels, test_similares_train, labels_train,
                                    labels_destination=labels_total, multilabel = multilabel)
         if type == 'SEMI':
-            file2.write("%s,VDSH, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_t, r_t, ratio_sup))
-            file2.write("%s,BAE, %d, %f, %f, %f\n" % (dataset_name, ball_r, p_b, r_b, ratio_sup))
+            file2.write("%s,VDSH, %d, %f, %f, %f, %d\n" % (dataset_name, ball_r, p_t, r_t, ratio_sup, Nb))
+            file2.write("%s,BAE, %d, %f, %f, %f, %d\n" % (dataset_name, ball_r, p_b, r_b, ratio_sup, Nb))
         else:
-            file2.write("%s,VDSH, %d, %f, %f\n" % (dataset_name, ball_r, p_t, r_t))
-            file2.write("%s,BAE, %d, %f, %f\n" % (dataset_name, ball_r, p_b, r_b))
+            file2.write("%s,VDSH, %d, %f, %f, %d\n" % (dataset_name, ball_r, p_t, r_t, Nb))
+            file2.write("%s,BAE, %d, %f, %f, %d\n" % (dataset_name, ball_r, p_b, r_b, Nb))
 
     file2.close()
     print("DONE ... ")
@@ -205,7 +204,6 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 ### ****************** SUPERVISED PLOTTING ****************** ###
 
 def load_results( type = 'UNSUP' ):
-    #### ----------- SUPERVISED ----------- ####
     if type == 'SEMI':
         columns = ['dataset', 'Algorithm', 'balls', 'Precision', 'Recall', 'sup_ratio']
     else:
@@ -225,6 +223,8 @@ def load_results( type = 'UNSUP' ):
 
 def plot_results(data, label, type = 'UNSUP', saving = True):
     # data = data_20news
+    import matplotlib.pyplot as plt
+
     plt.tight_layout()
     plt.plot(data.balls.unique(), data.Precision[data.Algorithm == 'BAE'], marker='o', color='blue', linewidth=2, label=r"$Prec_{BAE}$")
     plt.plot(data.balls.unique(), data.Precision[data.Algorithm == 'VDSH'], marker='o', color='lightblue', linewidth=2, label=r"$Prec_{VDSH}$")
@@ -242,6 +242,9 @@ def plot_results(data, label, type = 'UNSUP', saving = True):
 
 
 def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True):
+
+    import matplotlib.pyplot as plt
+
     data = data[data.sup_ratio == threshold]
     plt.tight_layout()
     plt.plot(data.balls.unique(), data.Precision[data.Algorithm == 'BAE'], marker='o', color='blue', linewidth=2, label=r"$Prec_{BAE}$")
@@ -282,6 +285,8 @@ def load_results_topk():
 
 
 def plot_results_topk(data, label, saving=True):
+    import matplotlib.pyplot as plt
+
     x = data.sup_ratio.unique()
     p_vae = data.Precision[(data.Algorithm == 'VDSH')]
     p_bae = data.Precision[(data['Algorithm'] == 'BAE')]

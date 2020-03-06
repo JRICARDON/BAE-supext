@@ -1,6 +1,9 @@
 from Utils import *
 from unsupervised_models import *
-from load_20news import *
+from load_snippets import *
+
+dataset_name = 'snippets'
+multilabel = False
 
 # batch_size = 2000
 # epochs = 20
@@ -8,15 +11,9 @@ from load_20news import *
 # type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
 # ratio_sup = .25
 
-
-dataset_name = '20news'
-multilabel = False
-
-
-
 ### ****************** Loading and Transforming ****************** ###
 
-X_raw, X, Y, list_dataset_labels = data_in_arrays(load_20news(), ratio_val = ratio_sup)
+X_raw, X, Y, list_dataset_labels = data_in_arrays(load_snippets(), ratio_val=ratio_sup)
 
 X_train_input, X_val_input, X_test_input = X[0], X[1], X[2]
 labels_train, labels_t, labels_val, labels_test = Y[0], Y[1], Y[2], Y[3]
@@ -30,12 +27,11 @@ labels_total = np.concatenate((labels_train,labels_val),axis=0)
 ### *********************** Modeling *********************** ###
 
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
-traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=0)
+traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],Nb=nb,units=500,layers_e=2,layers_d=0)
 traditional_vae.fit(X_total_input, X_total, epochs=epochs, batch_size=batch_size,verbose=2)
 
-binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],Nb=32,units=500,layers_e=2,layers_d=2)
+binary_vae,encoder_Bvae,generator_Bvae = binary_VAE(X_train.shape[1],Nb=nb,units=500,layers_e=2,layers_d=2)
 binary_vae.fit(X_total_input, X_total, epochs=epochs, batch_size=batch_size,verbose=2)
-
 
 
 
@@ -44,4 +40,5 @@ binary_vae.fit(X_total_input, X_total, epochs=epochs, batch_size=batch_size,verb
 save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 			 X_total_input, X_test_input, labels_train, labels_total, labels_test,
 			 dataset_name, max_radius,
-			 K_topK = 100, type = 'UNSUP', multilabel = multilabel )
+			 K_topK = 100, type = 'UNSUP', multilabel = multilabel, Nb = nb )
+
