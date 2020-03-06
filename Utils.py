@@ -205,9 +205,9 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 
 def load_results( type = 'UNSUP' ):
     if type == 'SEMI':
-        columns = ['dataset', 'Algorithm', 'balls', 'Precision', 'Recall', 'sup_ratio']
+        columns = ['dataset', 'Algorithm', 'balls', 'Precision', 'Recall', 'sup_ratio', 'Nb']
     else:
-        columns = ['dataset', 'Algorithm', 'balls', 'Precision', 'Recall']
+        columns = ['dataset', 'Algorithm', 'balls', 'Precision', 'Recall', 'Nb']
 
     # ********** Load data ********** #
     data_20news = pd.read_csv('results/' + type + '_Results_BallSearch_20news.csv', header=None)  # , encoding = 'utf-8')
@@ -221,16 +221,16 @@ def load_results( type = 'UNSUP' ):
 
     return data_20news, data_snippets, data_reuters
 
-def plot_results(data, label, type = 'UNSUP', saving = True):
+def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32):
     # data = data_20news
     import matplotlib.pyplot as plt
-
+    data = data[data.Nb == Nb]
     plt.tight_layout()
     plt.plot(data.balls.unique(), data.Precision[data.Algorithm == 'BAE'], marker='o', color='blue', linewidth=2, label=r"$Prec_{BAE}$")
     plt.plot(data.balls.unique(), data.Precision[data.Algorithm == 'VDSH'], marker='o', color='lightblue', linewidth=2, label=r"$Prec_{VDSH}$")
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'BAE'], marker='v', color='red', linewidth=2, label = r"$Recall_{BAE}$")
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'VDSH'], marker='v', color='salmon', linewidth=2, label = r"$Recall_{VDSH}$")
-    plt.title(label)
+    plt.title(label+ 'Nb=' + str(Nb))
     plt.legend()
     plt.xlabel('balls')
     if saving:
@@ -266,7 +266,7 @@ def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True)
 
 def load_results_topk():
     ## SEMI-SUPERVISED
-    cols = ['dataset', 'Algorithm', 'K', 'Precision', 'Recall', 'sup_ratio']
+    cols = ['dataset', 'Algorithm', 'K', 'Precision', 'Recall', 'sup_ratio', 'Nb']
     data_20news = pd.read_csv('results/SEMI_Results_Top_K_20news.csv', header=None)  # , encoding = 'utf-8')
     data_20news.columns = cols
 
@@ -284,8 +284,10 @@ def load_results_topk():
     return data_20news, data_snippets, data_reuters
 
 
-def plot_results_topk(data, label, saving=True):
+def plot_results_topk(data, label, saving=True, Nb = 32):
     import matplotlib.pyplot as plt
+
+    data = data[data.Nb == Nb]
 
     x = data.sup_ratio.unique()
     p_vae = data.Precision[(data.Algorithm == 'VDSH')]

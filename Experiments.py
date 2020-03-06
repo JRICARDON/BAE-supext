@@ -48,30 +48,3 @@ gc.collect()
 
 
 
-
-## ------ SEMI-SUPERVISED ------ ##
-
-type = 'SEMI' # ['UNSUP','SEMI', 'SUP']
-semi_supervised = True
-
-for ratio_sup in supervision_ratios:
-	exec(open('supervised_exp_20news.py').read())
-	gc.collect()
-
-
-type = 'SEMI' # ['UNSUP','SEMI', 'SUP']
-semi_supervised = True
-
-for ratio_sup in supervision_ratios:
-	exec(open('supervised_exp_reuters.py').read())
-	gc.collect()
-
-
-type = 'SEMI' # ['UNSUP','SEMI', 'SUP']
-semi_supervised = True
-
-for ratio_sup in supervision_ratios:
-	exec(open('supervised_exp_snippets.py').read())
-	gc.collect()
-
-
