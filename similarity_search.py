@@ -76,8 +76,8 @@ def measure_metrics(unique_labels_dataset,data_similars,labels_data,labels_desti
             recall += tp/count_labels[label]
         precision += tp/len(similars)
 
-        total_precision = precision/len(labels_data)
-        total_recall = recall / len(labels_data)
+    total_precision = precision/len(labels_data)
+    total_recall = recall / len(labels_data)
 
     return total_precision, total_recall
 

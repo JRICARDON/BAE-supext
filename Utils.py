@@ -232,9 +232,10 @@ def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32):
     plt.plot(data.balls.unique(), data.Recall[data['Algorithm'] == 'VDSH'], marker='v', color='salmon', linewidth=2, label = r"$Recall_{VDSH}$")
     plt.title(label+ ' Nb=' + str(Nb))
     plt.legend()
+    plt.xlim((0,10))
     plt.xlabel('balls')
     if saving:
-        plt.savefig('results/IMG/' + label + '_' + type + '.png')
+        plt.savefig('results/IMG/' + label + '_' + type + '_Nb=' + str(Nb) + '.png')
     plt.show()
     plt.close()
 
@@ -244,6 +245,7 @@ def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32):
 def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True, Nb = 32):
 
     import matplotlib.pyplot as plt
+    data = data[data.Nb == Nb]
 
     data = data[data.sup_ratio == threshold]
     plt.tight_layout()
@@ -254,8 +256,9 @@ def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True,
     plt.title(label + ' - sup = ' + str(threshold) + ' Nb=' + str(Nb))
     plt.legend()
     plt.xlabel('balls')
+    plt.xlim(0,10)
     if saving:
-        plt.savefig('results/IMG/' + label + '_' + type + '.png')
+        plt.savefig('results/IMG/' + label + '_' + type + '_Nb=' + str(Nb) +'.png')
     plt.show()
     plt.close()
 
@@ -284,7 +287,8 @@ def load_results_topk():
     return data_20news, data_snippets, data_reuters
 
 
-def plot_results_topk(data, label, saving=True, Nb = 32):
+def plot_results_topk(data, label, saving=True, Nb = 4):
+    #data = data_20news
     import matplotlib.pyplot as plt
 
     data = data[data.Nb == Nb]
@@ -302,7 +306,7 @@ def plot_results_topk(data, label, saving=True, Nb = 32):
     plt.legend()
     plt.xlabel('Supervision %')
     if saving:
-        plt.savefig('results/IMG/' + label + '_top_K_SEMI.png')
+        plt.savefig('results/IMG/' + label + '_Nb=' + str(Nb) + '_top_K_SEMI.png')
     plt.show()
     plt.close()
 
