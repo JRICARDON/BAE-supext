@@ -6,7 +6,7 @@ batch_size = 3000
 epochs = 3
 max_radius = 5
 nb = 4
-supervision_ratios = [.7, .3,]
+supervision_ratios = [.7, .3]
 
 
 ## ------ UNSUPERVISED ------ ##
