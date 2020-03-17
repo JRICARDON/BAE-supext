@@ -13,7 +13,7 @@ multilabel = False
 
 ### ****************** Loading and Transforming ****************** ###
 
-X_raw, X, Y, list_dataset_labels = data_in_arrays(load_snippets(), ratio_val=ratio_sup)
+X_raw, X, Y, list_dataset_labels = data_in_arrays(load_snippets())
 
 X_train_input, X_val_input, X_test_input = X[0], X[1], X[2]
 labels_train, labels_t, labels_val, labels_test = Y[0], Y[1], Y[2], Y[3]

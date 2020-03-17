@@ -9,10 +9,10 @@ nb = 4
 supervision_ratios = [.7, .3,]
 
 
+
 ## ------ UNSUPERVISED ------ ##
 
 type = 'UNSUP' #['UNSUP','SEMI', 'SUP']
-ratio_sup = .25
 exec(open('unsupervised_exp_20news.py').read())
 gc.collect()
 
@@ -23,9 +23,10 @@ exec(open('unsupervised_exp_snippets.py').read())
 gc.collect()
 
 
-
-
 ## ------ SUPERVISED ------ ##
+# type_sup = 'SUP_BAE_v1' # sBAE3
+type = 'SUP_BAE_v2' # sBAE4
+# type = 'SUP_BAE_v3' # sBAE4
 
 type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 semi_supervised = False
