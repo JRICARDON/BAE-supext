@@ -11,6 +11,7 @@ from load_20news import *
 # #['UNSUP','SEMI', 'SUP']
 # type = 'SEMI'
 # ratio_sup = .5
+# type = 'S1'
 
 
 dataset_name = '20news'
@@ -43,9 +44,15 @@ print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
 traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=0)
 traditional_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size,verbose=2)
 
-binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=2)
+if type_sup == 'SUP_BAE_v1':
+	binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=2)
+elif type_sup == 'SUP_BAE_v2':
+	binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=2)
+elif type_sup == 'SUP_BAE_v3':
+	binary_vae, encoder_Bvae, generator_Bvae = sBAE3(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
+
 binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size,verbose=2)
-name_model = 'BAE'
+name_model = type_sup
 
 
 
