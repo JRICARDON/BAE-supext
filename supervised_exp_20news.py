@@ -45,19 +45,19 @@ traditional_vae,encoder_Tvae,generator_Tvae = traditional_VAE(X_train.shape[1],n
 traditional_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size,verbose=2)
 
 if type_sup == 'SUP_BAE_v1':
-	binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=2)
-elif type_sup == 'SUP_BAE_v2':
-	binary_vae,encoder_Bvae,generator_Bvae = sBAE3(X_train.shape[1],n_classes,Nb=nb,units=500,layers_e=2,layers_d=2)
-elif type_sup == 'SUP_BAE_v3':
 	binary_vae, encoder_Bvae, generator_Bvae = sBAE3(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
-
-binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size,verbose=2)
-name_model = type_sup
+	binary_vae.fit(X_total_input, [X_total, Y_total_input], epochs=epochs, batch_size=batch_size, verbose=2)
+elif type_sup == 'SUP_BAE_v2':
+	binary_vae, encoder_Bvae, generator_Bvae = sBAE4(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
+	binary_vae.fit([X_total_input, Y_total_input], X_total, epochs=epochs, batch_size=batch_size, verbose=2)
+elif type_sup == 'SUP_BAE_v3':
+	binary_vae, encoder_Bvae, generator_Bvae = sBAE5(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
+	binary_vae.fit([X_total_input, Y_total_input], X_total, epochs=epochs, batch_size=batch_size, verbose=1)
 
 
 
 save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 			 X_total_input, X_test_input, labels_train, labels_total, labels_test,
 			 dataset_name, max_radius,
-			 K_topK = 100, type = type, multilabel = multilabel, ratio_sup = ratio_sup, Nb=nb)
+			 BAE_type = type_sup, K_topK = 100, type = type, multilabel = multilabel, ratio_sup = ratio_sup, Nb=nb)
 

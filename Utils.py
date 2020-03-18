@@ -119,7 +119,8 @@ from similarity_search import *
 
 def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
                  X_total_input, X_test_input, labels_train, labels_total, labels_test,
-                 dataset_name, max_radius, K_topK=100, type='UNSUP', multilabel = False, ratio_sup = None, Nb = 32):
+                 dataset_name, max_radius, BAE_type = 'BAE',
+                 K_topK=100, type='UNSUP', multilabel = False, ratio_sup = None, Nb = 32):
 
     p_t, r_t = evaluate_hashing(list_dataset_labels, encoder_Tvae, X_total_input, X_test_input, labels_total,
                                 labels_test, traditional=True, tipo="topK", multilabel = multilabel)
@@ -130,12 +131,12 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 
     if type == 'SEMI':
         file.write("%s,VDSH, %d, %f, %f, %f, %d\n" % (dataset_name, K_topK, p_t, r_t, ratio_sup, Nb))
-        file.write("%s,BAE, %d, %f, %f, %f, %d\n" % (dataset_name, K_topK, p_b, r_b, ratio_sup, Nb))
+        file.write("%s,%s, %d, %f, %f, %f, %d\n" % (dataset_name, BAE_type, K_topK, p_b, r_b, ratio_sup, Nb))
         file.close()
         print("DONE ...")
     else:
         file.write("%s,VDSH, %d, %f, %f, %d\n" % (dataset_name, K_topK, p_t, r_t, Nb))
-        file.write("%s,BAE, %d, %f, %f, %d\n" % (dataset_name, K_topK, p_b, r_b, Nb))
+        file.write("%s,%s, %d, %f, %f, %d\n" % (dataset_name, BAE_type, K_topK, p_b, r_b, Nb))
         file.close()
         print("DONE ...")
 
@@ -171,10 +172,10 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
                                    labels_destination=labels_total, multilabel = multilabel)
         if type == 'SEMI':
             file2.write("%s,VDSH, %d, %f, %f, %f, %d\n" % (dataset_name, ball_r, p_t, r_t, ratio_sup, Nb))
-            file2.write("%s,BAE, %d, %f, %f, %f, %d\n" % (dataset_name, ball_r, p_b, r_b, ratio_sup, Nb))
+            file2.write("%s,%s, %d, %f, %f, %f, %d\n" % (dataset_name, BAE_type, ball_r, p_b, r_b, ratio_sup, Nb))
         else:
             file2.write("%s,VDSH, %d, %f, %f, %d\n" % (dataset_name, ball_r, p_t, r_t, Nb))
-            file2.write("%s,BAE, %d, %f, %f, %d\n" % (dataset_name, ball_r, p_b, r_b, Nb))
+            file2.write("%s,%s, %d, %f, %f, %d\n" % (dataset_name, BAE_type, ball_r, p_b, r_b, Nb))
 
     file2.close()
     print("DONE ... ")
