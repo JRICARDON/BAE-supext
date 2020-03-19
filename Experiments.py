@@ -2,11 +2,10 @@ import gc
 from Utils import *
 create_dir('results/')
 
-batch_size = 3000
-epochs = 3
-max_radius = 5
-nb = 4
-
+batch_size = 100
+epochs = 50
+nb = 32
+max_radius = nb-1
 
 ## ------ UNSUPERVISED ------ ##
 
@@ -51,7 +50,7 @@ gc.collect()
 
 ## ------ SEMI-SUPERVISED ------ ##
 type_sup = 'SUP_BAE_v1' # sBAE3
-supervision_ratios = [.7, .3]
+supervision_ratios = [.99, 0.9, .7, .5, .3, .1, .01]
 
 type = 'SEMI' # ['UNSUP','SEMI', 'SUP']
 semi_supervised = True
