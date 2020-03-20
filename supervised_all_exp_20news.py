@@ -11,8 +11,6 @@ from load_20news import *
 # ratio_sup = .5
 # semi_supervised = False
 
-
-
 dataset_name = '20news'
 multilabel = False
 
