@@ -186,6 +186,64 @@ def save_results(list_dataset_labels, encoder_Tvae, encoder_Bvae,
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
+
+from similarity_search import *
+def save_single_model(list_dataset_labels, X_total_input, X_test_input, labels_train, labels_total, labels_test,
+                      encoder, dataset_name, max_radius = 15, model_label = 'VDSH',
+                      K_topK=100, type='UNSUP', multilabel = False, ratio_sup = None, Nb = 32):
+
+
+    prec, recall = evaluate_hashing(list_dataset_labels, encoder, X_total_input, X_test_input, labels_total,
+                                    labels_test, traditional=True, tipo="topK", multilabel = multilabel)
+
+    file = open("results/" + type + "_Results_Top_K_%s.csv" % dataset_name, "a")
+
+    if type == 'SEMI':
+        file.write("%s,%s, %d, %f, %f, %f, %d\n" % (dataset_name, model_label, K_topK, prec, recall, ratio_sup, Nb))
+        file.close()
+        print("DONE ...")
+    else:
+        file.write("%s,%s, %d, %f, %f, %d\n" % (dataset_name, model_label, K_topK, prec, recall, Nb))
+        file.close()
+        print("DONE ...")
+
+    ### ****************** Ball Search Methods ****************** ###
+
+    print("\n=====> Evaluate the Models using Range/Ball Search ... \n")
+
+    encode_total = encoder.predict(X_total_input)
+    encode_test = encoder.predict(X_test_input)
+
+
+    if model_label == 'VDSH':
+        median = MedianHashing()
+        median.fit(encode_total)
+        total_hash = median.transform(encode_total)
+        test_hash = median.transform(encode_test)
+    else:
+        probas_total = keras.activations.sigmoid(encode_total).eval(session=K.get_session())
+        probas_test = keras.activations.sigmoid(encode_test).eval(session=K.get_session())
+        total_hash = (probas_total > 0.5) * 1
+        test_hash = (probas_test > 0.5) * 1
+
+    ball_radius = np.arange(0, max_radius)  # ball of radius graphic
+
+    file2 = open("results/" + type + "_Results_BallSearch_%s.csv" % dataset_name, "a")
+
+    for ball_r in ball_radius:
+        test_similares_train = get_similar(test_hash, total_hash, tipo='ball', ball=ball_r)
+        p_b, r_b = measure_metrics(list_dataset_labels, test_similares_train, labels_test,
+                                   labels_destination=labels_total, multilabel = multilabel)
+
+        if type == 'SEMI':
+            file2.write("%s,%s, %d, %f, %f, %f, %d\n" % (dataset_name, model_label, ball_r, p_b, r_b, ratio_sup, Nb))
+        else:
+            file2.write("%s,%s, %d, %f, %f, %d\n" % (dataset_name, model_label, ball_r, p_b, r_b, Nb))
+
+    file2.close()
+    print("DONE ... ")
+
+
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
