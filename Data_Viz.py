@@ -2,7 +2,7 @@
 from Utils import *
 
 create_dir('results/IMG')
-nb = 32
+nb = 64
 
 ## Unsupervised
 data_20news, data_snippets, data_reuters = load_results(type='UNSUP')
