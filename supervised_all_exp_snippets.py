@@ -2,21 +2,17 @@ from Utils import *
 from supervised_models import *
 from load_snippets import *
 
-dataset_name = '20news'
-batch_size = 5000
-epochs = 2
-multilabel = False
-nb = 4
-max_radius = 1
-#
+# batch_size = 5000
+# epochs = 2
+# nb = 4
+# max_radius = 1
 # #['UNSUP','SEMI', 'SUP']
-type = 'SUP'
-ratio_sup = .5
-
+# type = 'SUP'
+# ratio_sup = .5
+# semi_supervised = False
 
 dataset_name = 'snippets'
 multilabel = False
-semi_supervised = False
 
 ### ****************** Loading and Transforming ****************** ###
 
@@ -37,7 +33,7 @@ labels_total = np.concatenate((labels_train, labels_val), axis=0)
 
 Y_total_input, y_test_input = target_in_array(list_dataset_labels, n_classes,
 											  labels_train, labels_val, labels_test,
-											  multilabel = False, semi_supervised = semi_supervised)
+											  multilabel = multilabel, semi_supervised = semi_supervised)
 
 
 print("\n=====> Creating and Training the Models (VDSH and BAE) ... \n")
