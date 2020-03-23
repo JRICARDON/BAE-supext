@@ -2,7 +2,7 @@
 from Utils import *
 
 create_dir('results/IMG')
-nb = 64
+nb = 4
 threshold = .5
 
 ## Semi-Supervised

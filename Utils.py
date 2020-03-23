@@ -302,8 +302,8 @@ def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32, type_model
 ######################################################################
 
 
-def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True, Nb = 32, type_model = 'SUP_BAE_v1'):
-
+def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True, Nb = 32, type_model = 'sBAE3'):
+    #data = data_20news
     import matplotlib.pyplot as plt
 
     data = data[data.Nb == Nb]
@@ -348,7 +348,7 @@ def load_results_topk():
     return data_20news, data_snippets, data_reuters
 
 
-def plot_results_topk(data, label, saving=True, Nb = 4, type_model = 'SUP_BAE_v1'):
+def plot_results_topk(data, label, saving=True, Nb = 4, type_model = 'sBAE3'):
     #data = data_20news
     import matplotlib.pyplot as plt
 
