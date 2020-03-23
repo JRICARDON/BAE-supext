@@ -39,6 +39,8 @@ plot_results(data = data_reuters, label='Reuters (Sup type 2)', type='SUP', Nb =
 
 
 
+
+
 ## Supervised
 algorithm = 'sBAE5'
 data_20news, data_snippets, data_reuters = load_results(type='SUP')
