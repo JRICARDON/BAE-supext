@@ -54,6 +54,7 @@ plot_results(data = data_reuters, label='Reuters (Sup type 3)', type='SUP', Nb =
 #####################
 ## ---- Top K ---- ##
 
+
 def read_files_topk(type = 'UNSUP'):
     type = 'results/' + type
 
