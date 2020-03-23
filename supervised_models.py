@@ -47,7 +47,7 @@ def define_pre_generator(Nb,data_dim,layers=2,units=32,dropout=0.0,BN=False,excl
             model.add(BatchNormalization())
     return model
 
-def traditional_VAE(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+def traditional_VAE(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True, weight_sup = 1, semi_flag = False):
     pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
     print("pre-encoder network:")
     pre_encoder.summary()
@@ -88,7 +88,14 @@ def traditional_VAE(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=
         return K.mean(reconstruction_loss  + kl_loss)
 
     traditional_vae = Model(inputs=x, outputs=[output,supervised_layer])
-    traditional_vae.compile(optimizer=opt,loss=[vae_loss,'categorical_crossentropy'],loss_weights=[1., 1000.])
+
+    w1 = 1.
+    if semi_flag:
+        w2 =  1000./weight_sup
+    else:
+        w2 = 1000.
+
+    traditional_vae.compile(optimizer=opt,loss=[vae_loss,'categorical_crossentropy'],loss_weights=[w1, w2])
  
     return traditional_vae,encoder,generator
 
@@ -196,7 +203,7 @@ def sBAE2(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
     return binary_vae, encoder,generator
 
 
-def sBAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
+def sBAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True, weight_sup = 1, semi_flag = False):
     pre_encoder = define_pre_encoder(data_dim, layers=layers_e,units=units,BN=BN)
     print("pre-encoder network:")
     pre_encoder.summary()
@@ -236,7 +243,15 @@ def sBAE3(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
         return K.mean(reconstruction_loss  + kl_disc_loss)
 
     binary_vae = Model(inputs=x, outputs=[output,supervised_layer])
-    binary_vae.compile(optimizer=opt, loss=[sup_gumbel_loss,'categorical_crossentropy'],loss_weights=[1., 1000.])
+
+    w1 = 1.
+    if semi_flag:
+        w2 =  1000./weight_sup
+    else:
+        w2 = 1000.
+
+    binary_vae.compile(optimizer=opt, loss=[sup_gumbel_loss,'categorical_crossentropy'],
+                       loss_weights=[w1, w2])
 
     return binary_vae, encoder,generator
 
@@ -268,7 +283,7 @@ def sBAE4(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
 
     output = Dense(data_dim, activation='softmax')(hidden_generator)
     
-    supervised_layer = Dense(n_classes, activation='softmax')(hidden_generator)#req n_classes
+    supervised_layer = Dense(n_classes, activation='softmax')(hidden_generator) # req n_classes
 
     margin = 10
 
@@ -286,11 +301,11 @@ def sBAE4(data_dim,n_classes,Nb,units,layers_e,layers_d,opt='adam',BN=True):
         reconstruction_loss = keras.losses.categorical_crossentropy(x, x_hat)#
         supervised_loss = keras.losses.categorical_crossentropy(y, supervised_layer)#req y
 
-        dist = keras.activations.sigmoid(logits_b) #B_j = Q(b_j) probability of b_j
-        #by formula
+        dist = keras.activations.sigmoid(logits_b) # B_j = Q(b_j) probability of b_j
+        # by formula
         kl_disc_loss = Nb*np.log(2) + K.sum( dist*K.log(dist + K.epsilon()) + (1-dist)* K.log(1-dist + K.epsilon()),axis=1)
         # new.. using logits -- second term cannot be simplified
-        #disc_loss = Nb*np.log(2) + K.sum( dist*logits_b + K.log(1-dist + K.epsilon()),axis=1)
+        # disc_loss = Nb*np.log(2) + K.sum( dist*logits_b + K.log(1-dist + K.epsilon()),axis=1)
         return K.mean(reconstruction_loss + 0.0*kl_disc_loss + 1000*loss_siamese)
 
     binary_vae = Model(inputs=[x,y], outputs=output)
