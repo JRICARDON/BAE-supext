@@ -373,14 +373,3 @@ def plot_results_topk(data, label, saving=True, Nb = 4, type_model = 'sBAE3'):
 
 ######################################################################
 
-
-
-
-
-
-
-
-
-
-
-

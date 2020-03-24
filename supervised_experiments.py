@@ -16,21 +16,21 @@ from supervised_models import *
 
 if dataset_name == '20news':
     from load_20news import *
-    X_raw, X, Y, list_dataset_labels = data_in_arrays(load_20news(), ratio_val=ratio_sup)
+    load_data = load_20news()
     multilabel = False
 elif dataset_name == 'snippets':
     from load_snippets import *
-    X_raw, X, Y, list_dataset_labels = data_in_arrays(load_snippets(), ratio_val=ratio_sup)
+    load_data = load_snippets()
     multilabel = False
 elif dataset_name == 'reuters':
     from load_reuters import *
-    X_raw, X, Y, list_dataset_labels = data_in_arrays(load_reuters(), ratio_val=ratio_sup)
+    load_data = load_reuters()
     multilabel = True
-
 
 
 ### ****************** Loading and Transforming ****************** ###
 
+X_raw, X, Y, list_dataset_labels = data_in_arrays(load_data)
 X_train_input, X_val_input, X_test_input = X[0], X[1], X[2]
 labels_train, labels_t, labels_val, labels_test = Y[0], Y[1], Y[2], Y[3]
 X_train, X_val, X_test = X_raw[0], X_raw[1], X_raw[2]

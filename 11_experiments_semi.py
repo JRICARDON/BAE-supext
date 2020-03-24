@@ -41,21 +41,21 @@ for ratio_sup in supervision_ratios:
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_20news.py').read())
+# exec(open('single_dataset/supervised_exp_20news.py').read())
 # gc.collect()
 #
 #
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_reuters.py').read())
+# exec(open('single_dataset/supervised_exp_reuters.py').read())
 # gc.collect()
 #
 #
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_snippets.py').read())
+# exec(open('single_dataset/supervised_exp_snippets.py').read())
 # gc.collect()
 #
 #
@@ -65,21 +65,21 @@ for ratio_sup in supervision_ratios:
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_20news.py').read())
+# exec(open('single_dataset/supervised_exp_20news.py').read())
 # gc.collect()
 #
 #
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_reuters.py').read())
+# exec(open('single_dataset/supervised_exp_reuters.py').read())
 # gc.collect()
 #
 #
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_snippets.py').read())
+# exec(open('single_dataset/supervised_exp_snippets.py').read())
 # gc.collect()
 #
 #
@@ -90,19 +90,19 @@ for ratio_sup in supervision_ratios:
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_20news.py').read())
+# exec(open('single_dataset/supervised_exp_20news.py').read())
 # gc.collect()
 #
 #
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_reuters.py').read())
+# exec(open('single_dataset/supervised_exp_reuters.py').read())
 # gc.collect()
 #
 #
 # type = 'SUP' # ['UNSUP','SEMI', 'SUP']
 # semi_supervised = False
 # ratio_sup = .25
-# exec(open('supervised_VHDS_vs_sBAE3/supervised_exp_snippets.py').read())
+# exec(open('single_dataset/supervised_exp_snippets.py').read())
 # gc.collect()
