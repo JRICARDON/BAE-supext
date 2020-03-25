@@ -5,13 +5,13 @@ create_dir('results/')
 batch_size = 100
 epochs = 50
 max_radius = 15
-nb = 32
+nb = 4
 
 
 ## ------ SEMI-SUPERVISED ------ ##
 # type_sup = 'sBAE3'
 type = 'SEMI'
-supervision_ratios = [.99, .9, .7, .5, .3, .1]
+supervision_ratios = [.9, .5, .1]
 semi_supervised = True
 
 dataset_name = '20news'

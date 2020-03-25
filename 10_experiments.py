@@ -2,10 +2,11 @@ import gc
 from Utils import *
 create_dir('results/')
 
-batch_size = 6000
-epochs = 2
+batch_size = 100
+epochs = 50
+max_radius = 15
 nb = 4
-max_radius = 2
+
 ratio_sup = .5
 semi_supervised = False
 
