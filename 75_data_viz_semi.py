@@ -2,7 +2,7 @@
 from Utils import *
 
 create_dir('results/IMG')
-nb = 4
+nb = 64
 threshold = .5
 
 ## Semi-Supervised
@@ -20,3 +20,10 @@ plot_results_topk(data_20news, label='20news', Nb = nb)
 plot_results_topk(data_snippets, label='Snippets', Nb = nb)
 plot_results_topk(data_reuters, label='Reuters', Nb = nb)
 
+
+
+data_20news, data_snippets, data_reuters = load_data_vs_nb( type = 'SEMI')
+
+plot_topk_vs_nb(data_20news, '20news', type = 'SEMI')
+plot_topk_vs_nb(data_snippets, 'snippets', type = 'SEMI')
+plot_topk_vs_nb(data_reuters, 'reuters', type = 'SEMI')

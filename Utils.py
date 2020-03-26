@@ -7,6 +7,8 @@ import os
 nltk.download('reuters')
 nltk.download('wordnet')
 
+
+# Creation a folder in a given path
 def create_dir (path):
     if not os.path.exists(path):
         print('The directory', path, 'does not exist and will be created')
@@ -16,6 +18,7 @@ def create_dir (path):
 
 # >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> #
 
+# encode text in numpt array - only tested in 20news, snippets and reuters
 def data_in_arrays( loading_function, ratio_val = 0.25):
     # loading_function = load_20news()
     # ratio_val = 0.25
@@ -280,8 +283,12 @@ def load_results( type = 'UNSUP' ):
 
     return data_20news, data_snippets, data_reuters
 
-def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32, type_model = 'BAE'):
-    #data = data_snippets
+def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32,
+                 type_model = 'BAE', path = 'results/IMG', show = False):
+    # data = data_snippets
+    path = path + '/' + type + '/' + 'ball_search/'
+    create_dir(path)
+
     import matplotlib.pyplot as plt
     data = data[data.Nb == Nb]
 
@@ -295,16 +302,21 @@ def plot_results(data, label, type = 'UNSUP', saving = True, Nb = 32, type_model
     # plt.xlim((0,10))
     plt.xlabel('balls')
     if saving:
-        plt.savefig('results/IMG/' + label + '_' + type + '_Nb=' + str(Nb) + '.png')
-    plt.show()
+        plt.savefig(path + label + '_' + str(Nb) + '.png')
+    if show:
+        plt.show()
     plt.close()
 
 ######################################################################
 
 
-def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True, Nb = 32, type_model = 'sBAE3'):
-    #data = data_20news
+def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True,
+                      Nb = 32, type_model = 'sBAE3', path = 'results/IMG/', show = False):
+    # data = data_20news
     import matplotlib.pyplot as plt
+
+    path = path + '/' + type + '/' + 'ball_search/'
+    create_dir(path)
 
     data = data[data.Nb == Nb]
     data = data[data.sup_ratio == threshold]
@@ -319,8 +331,9 @@ def plot_results_semi(data, label, type = 'SEMI', threshold = .5, saving = True,
     plt.xlabel('balls')
     # plt.xlim(0,10)
     if saving:
-        plt.savefig('results/IMG/' + label + '_' + type + '_Nb=' + str(Nb) +'.png')
-    plt.show()
+        plt.savefig(path + label + '_' + str(Nb) +'.png')
+    if show:
+        plt.show()
     plt.close()
 
 
@@ -348,9 +361,13 @@ def load_results_topk():
     return data_20news, data_snippets, data_reuters
 
 
-def plot_results_topk(data, label, saving=True, Nb = 4, type_model = 'sBAE3'):
+def plot_results_topk(data, label, saving=True, Nb=4, type_model='sBAE3',
+                      path='results/IMG/SEMI/', show=False):
     #data = data_20news
     import matplotlib.pyplot as plt
+
+    path = path + '% Supervision (top_k)/'
+    create_dir(path)
 
     data = data[data.Nb == Nb]
     x = data.sup_ratio.unique()
@@ -367,9 +384,77 @@ def plot_results_topk(data, label, saving=True, Nb = 4, type_model = 'sBAE3'):
     plt.legend()
     plt.xlabel('Supervision %')
     if saving:
-        plt.savefig('results/IMG/' + label + '_Nb=' + str(Nb) + '_top_K_SEMI.png')
-    plt.show()
+        plt.savefig(path + label + '_' + str(Nb) + '.png')
+    if show:
+        plt.show()
     plt.close()
 
 ######################################################################
 
+
+
+
+def load_data_vs_nb(type = 'UNSUP'):
+
+    # type = 'SEMI'
+    type = 'results/' + type
+    data_20news = pd.read_csv(type + '_Results_Top_K_20news.csv',  header=None)
+    data_20news.label = '20news'
+    data_20news.columns = ['Data', 'Algorithm', 'K', 'Precision', 'Recall', 'n_bit']
+
+    data_snippets = pd.read_csv(type + '_Results_Top_K_snippets.csv',  header=None)
+    data_snippets.label = 'snippets'
+    data_snippets.columns = ['Data', 'Algorithm', 'K', 'Precision', 'Recall', 'n_bit']
+
+    data_reuters = pd.read_csv(type + '_Results_Top_K_reuters.csv',  header=None)
+    data_reuters.label = 'reuters'
+    data_reuters.columns = ['Data', 'Algorithm', 'K', 'Precision', 'Recall', 'n_bit']
+
+    # data = pd.concat([data_20news, data_snippets, data_reuters], ignore_index=True, axis= 0, sort=True)
+    # data.columns = ['Data', 'Algorithm', 'K', 'Precision', 'Recall', 'n_bit']
+
+    return data_20news, data_snippets, data_reuters
+
+
+
+def plot_topk_vs_nb(data, label, saving = True, type = 'UNSUP',
+                    path='results/IMG/', show=False):
+
+    import matplotlib.pyplot as plt
+    from matplotlib.pyplot import cm
+
+    path = path + '/' + type + '/topk_vs_nb/'
+    create_dir(path)
+
+    # data = data_20news
+    # label = '20news'
+
+    algos = np.sort(data.Algorithm.unique())[::-1]
+    # color = iter(cm.rainbow(np.linspace(0, 1, len(algos))))
+
+    plt.tight_layout()
+    color = cm.rainbow(np.linspace(0, 1, len(algos)))
+
+    for al, c in zip(algos, color):
+        plt.subplot(1, 2, 1)
+        plt.plot(data.n_bit[data.Algorithm == al ], data.Precision[ data.Algorithm == al ], marker='o',
+                 c=c, label=al)
+        plt.title('Precision')
+        plt.legend()
+        plt.xlabel('Nb')
+        plt.xticks(data.n_bit[data.Algorithm == al ])
+
+    for al, c in zip(algos, color):
+        plt.subplot(1, 2, 2)
+        plt.plot(data.n_bit[data.Algorithm == al ], data.Recall[ data.Algorithm == al ], marker='o',
+                 c=c, label=al)
+        plt.title('Recall')
+        plt.legend()
+        plt.xlabel('Nb')
+        plt.xticks(data.n_bit[data.Algorithm == al])
+
+    plt.suptitle(label + ' - K = 100')
+    if saving:
+        plt.savefig(path + label + '.png')
+    plt.show()
+    plt.close()

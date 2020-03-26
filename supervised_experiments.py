@@ -77,19 +77,19 @@ save_single_model(list_dataset_labels, X_total_input, X_test_input, labels_train
 
 
 # elif type_sup == 'SUP_BAE_v2':
-# binary_vae_v2, encoder_Bvae_v2, generator_Bvae_v2 = sBAE4(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
-# binary_vae_v2.fit([X_total_input, Y_total_input], X_total, epochs=epochs, batch_size=batch_size, verbose=2)
-# model = 'sBAE4'
-# save_single_model(list_dataset_labels, X_total_input, X_test_input, labels_train, labels_total, labels_test,
-#                   encoder = encoder_Bvae_v2, dataset_name = dataset_name, model_label = model, K_topK = 100,
-#                   max_radius = max_radius, type = type, multilabel = multilabel, ratio_sup = ratio_sup, Nb=nb)
+binary_vae_v2, encoder_Bvae_v2, generator_Bvae_v2 = sBAE4(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
+binary_vae_v2.fit([X_total_input, Y_total_input], X_total, epochs=epochs, batch_size=batch_size, verbose=2)
+model = 'sBAE4'
+save_single_model(list_dataset_labels, X_total_input, X_test_input, labels_train, labels_total, labels_test,
+                  encoder = encoder_Bvae_v2, dataset_name = dataset_name, model_label = model, K_topK = 100,
+                  max_radius = max_radius, type = type, multilabel = multilabel, ratio_sup = ratio_sup, Nb=nb)
 
 
 # elif type_sup == 'SUP_BAE_v3':
-# binary_vae_v3, encoder_Bvae_v3, generator_Bvae_v3 = sBAE5(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
-# binary_vae_v3.fit([X_total_input, Y_total_input], X_total, epochs=epochs, batch_size=batch_size, verbose=2)
-# model = 'sBAE5'
-# save_single_model(list_dataset_labels, X_total_input, X_test_input, labels_train, labels_total, labels_test,
-#                   encoder = encoder_Bvae_v3, dataset_name = dataset_name, model_label = model, K_topK = 100,
-#                   max_radius = max_radius, type = type, multilabel = multilabel, ratio_sup = ratio_sup, Nb=nb)
+binary_vae_v3, encoder_Bvae_v3, generator_Bvae_v3 = sBAE5(X_train.shape[1], n_classes, Nb=nb, units=500, layers_e=2, layers_d=2)
+binary_vae_v3.fit([X_total_input, Y_total_input], X_total, epochs=epochs, batch_size=batch_size, verbose=2)
+model = 'sBAE5'
+save_single_model(list_dataset_labels, X_total_input, X_test_input, labels_train, labels_total, labels_test,
+                  encoder = encoder_Bvae_v3, dataset_name = dataset_name, model_label = model, K_topK = 100,
+                  max_radius = max_radius, type = type, multilabel = multilabel, ratio_sup = ratio_sup, Nb=nb)
 
